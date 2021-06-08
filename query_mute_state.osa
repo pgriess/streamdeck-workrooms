@@ -1,0 +1,38 @@
+#!/usr/bin/env osascript
+#
+# Get mute state from any active calls. Returns MUTED, ACTIVE, or UNKNOWN by
+# writing to stdout.
+#
+# NOTES:
+#
+#   * Chrome only
+#
+#   * User must enable this in Chrome via the menu View->Developer->Apple
+#     JavaScript from Apple Events
+
+tell application "Google Chrome"
+    repeat with w in windows
+        repeat with t in tabs of w
+						# TODO: Handle multiple tabs with calls. Only one should be active.
+            if title of t is "Workplace Room" then
+                tell t
+                    # The set of buttons can be different, e.g. index 4 on the
+                    # call I'm currently on is video, not audio. So we grab the
+                    # text of all buttons that includes 'mute'. Note that if
+                    # the number of buttons matching is not 1, we'll end up in
+                    # UNKNOWN, which is what we'd want here.
+                    set muteText to execute javascript "Array.from(document.querySelectorAll('button')).filter((n) => { return n.textContent.match(/mute/i); }).map((n) => { return n.textContent; }).join('');"
+                    if muteText is "Unmute microphone"
+                      return "MUTED"
+                    else
+                      if muteText is "Mute microphone"
+                        return "ACTIVE"
+                      else
+                        return "UNKNOWN"
+                      end if
+                    end if
+                end tell
+            end if
+        end repeat
+    end repeat
+end tell
