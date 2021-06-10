@@ -37,6 +37,10 @@ async def hello(event, uuid, ws_url):
                         error('context changed from {} to {}'.format(context, in_jo['context']))
                         context = in_jo['context']
 
+                if in_jo.get('event') == 'keyUp':
+                    info('toggling mute state')
+                    subprocess.check_call('/Users/pgriess/src/pgriess-streamdeck-fb/toggle_mute_state.osa', encoding='utf-8')
+
             except asyncio.TimeoutError:
                 out = subprocess.check_output('/Users/pgriess/src/pgriess-streamdeck-fb/query_mute_state.osa', encoding='utf-8').strip()
                 info('current state is {}'.format(out))
@@ -44,19 +48,19 @@ async def hello(event, uuid, ws_url):
                 if out != current_state:
                     info('current state changed from {} to {}'.format(current_state, out))
 
-                current_state = out
+                    current_state = out
 
-                out_jo = {'event': 'setState', 'context': context, 'payload': {}}
-                if current_state == 'ACTIVE':
-                    out_jo['payload']['state'] = 0
-                elif current_state == 'MUTED':
-                    out_jo['payload']['state'] = 1
-                else:
-                    pass
+                    out_jo = {'event': 'setState', 'context': context, 'payload': {}}
+                    if current_state == 'ACTIVE':
+                        out_jo['payload']['state'] = 0
+                    elif current_state == 'MUTED':
+                        out_jo['payload']['state'] = 1
+                    else:
+                        pass
 
-                out_msg = json.dumps(out_jo)
-                info('sending: {}'.format(out_msg))
-                await ws.send(out_msg)
+                    out_msg = json.dumps(out_jo)
+                    info('sending: {}'.format(out_msg))
+                    await ws.send(out_msg)
             except:
                 error(traceback.format_exc())
 
