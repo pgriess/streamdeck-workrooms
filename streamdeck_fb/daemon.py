@@ -13,7 +13,7 @@ import traceback
 import websockets
 
 
-async def hello(event, uuid, ws_url, muted_image, active_image):
+async def ws_client(event, uuid, ws_url, muted_image, active_image):
     async with websockets.connect(ws_url) as ws:
         info('established websocket connection')
         out_msg = json.dumps({'event': event, 'uuid': uuid})
@@ -121,4 +121,4 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
     active_image = load_image_string('active.png')
 
     asyncio.get_event_loop().run_until_complete(
-        hello(args.registerEvent, args.pluginUUID, ws_url, muted_image, active_image))
+        ws_client(args.registerEvent, args.pluginUUID, ws_url, muted_image, active_image))
