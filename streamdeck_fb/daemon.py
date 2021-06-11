@@ -61,6 +61,9 @@ async def hello(event, uuid, ws_url):
                     out_msg = json.dumps(out_jo)
                     info('sending: {}'.format(out_msg))
                     await ws.send(out_msg)
+            except websockets.exceptions.ConnectionClosedOK:
+                info('ws server disconnected; exiting')
+                return
             except:
                 error(traceback.format_exc())
 
