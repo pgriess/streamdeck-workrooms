@@ -1,0 +1,38 @@
+{
+  "Actions": [
+    {
+      "Icon": "plugin",
+      "Name": "Microphone",
+      "States": [
+        {
+          "Image": "active",
+          "TitleAlignment": "middle",
+          "FontSize": "17"
+        },
+        {
+          "Image": "muted",
+          "TitleAlignment": "middle",
+          "FontSize": "17"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "This action toggles the microphone.",
+      "UUID": "in.std.fb.microphone"
+    }
+  ],
+  "Author": "Peter Griess",
+  "CodePathMac": "daemon",
+  "Description": "Bindings for Facebook tools.",
+  "Category": "FB",
+  "CategoryIcon": "category",
+  "Name": "Rooms",
+  "Icon": "plugin",
+  "URL": "https://github.com/pgriess",
+  "Version": "0.1",
+  "OS": [
+    {
+        "Platform": "mac",
+        "MinimumVersion" : "10.11"
+    }
+  ]
+}

@@ -1,2 +1,61 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path d="M20.01 34h8a1 1 0 1 1 0 2h-8a1 1 0 1 1 0-2m-5-10.498a1 1 0 0 1 1.999 0c0 .75.119 1.47.337 2.147a.989.989 0 0 1-.246 1c-.52.522-1.424.326-1.652-.374a8.952 8.952 0 0 1-.439-2.773m14.002 0a5 5 0 0 1-5 5 4.93 4.93 0 0 1-2.026-.435.713.713 0 0 0-.795.149l-.496.495c-.303.304-.236.824.146 1.02.951.49 2.026.77 3.17.77a7 7 0 0 0 7.002-6.999 1 1 0 0 1 2 0c0 4.97-4.03 8.999-9.002 8.999a8.902 8.902 0 0 1-4.708-1.344.969.969 0 0 0-1.196.14l-4.399 4.398a1 1 0 0 1-1.414-1.414l22-21.988a1 1 0 0 1 1.414 1.413l-6.11 6.107a1.998 1.998 0 0 0-.586 1.414v2.275zm-.721-8.036L19.9 23.85a.527.527 0 0 1-.899-.373l.008-6.474a5 5 0 0 1 9.403-2.37.704.704 0 0 1-.122.832z"></path></svg>
+<svg
+   viewBox="0 0 48 48"
+   version="1.1"
+   id="svg59"
+   sodipodi:docname="muted.svg"
+   inkscape:version="1.1 (c4e8f9e, 2021-05-24)"
+   inkscape:export-filename="/Users/pgriess/src/pgriess-streamdeck-fb/muted.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs63">
+    <color-profile
+       name="ACES-CG-Linear--Academy-Color-Encoding-System-AP1-"
+       xlink:href="file:///System/Library/ColorSync/Profiles/ACESCG%20Linear.icc"
+       id="color-profile3528" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview61"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     showgrid="false"
+     inkscape:zoom="18.6875"
+     inkscape:cx="17.043478"
+     inkscape:cy="23.973244"
+     inkscape:window-width="1726"
+     inkscape:window-height="1224"
+     inkscape:window-x="748"
+     inkscape:window-y="300"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer2" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer 2">
+    <circle
+       style="fill:#c83232;fill-rule:evenodd;fill-opacity:1"
+       id="path1164"
+       cx="24"
+       cy="24"
+       r="19.183947" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer1"
+     inkscape:label="Layer 1">
+    <path
+       d="m 20.015081,33.998849 h 8 a 1,1 0 1 1 0,2 h -8 a 1,1 0 1 1 0,-2 m -5,-10.498 a 1,1 0 0 1 1.999,0 c 0,0.75 0.119,1.47 0.337,2.147 a 0.989,0.989 0 0 1 -0.246,1 c -0.52,0.522 -1.424,0.326 -1.652,-0.374 a 8.952,8.952 0 0 1 -0.439,-2.773 m 14.002,0 a 5,5 0 0 1 -5,5 4.93,4.93 0 0 1 -2.026,-0.435 0.713,0.713 0 0 0 -0.795,0.149 l -0.496,0.495 c -0.303,0.304 -0.236,0.824 0.146,1.02 0.951,0.49 2.026,0.77 3.17,0.77 a 7,7 0 0 0 7.002,-6.999 1,1 0 0 1 2,0 c 0,4.97 -4.03,8.999 -9.002,8.999 a 8.902,8.902 0 0 1 -4.708,-1.344 0.969,0.969 0 0 0 -1.196,0.14 l -4.399,4.398 a 1,1 0 0 1 -1.414,-1.414 l 22,-21.988 a 1,1 0 0 1 1.414,1.413 l -6.11,6.107 a 1.998,1.998 0 0 0 -0.586,1.414 z m -0.721,-8.036 -8.39,8.384 a 0.527,0.527 0 0 1 -0.899,-0.373 l 0.008,-6.474 a 5,5 0 0 1 9.403,-2.37 0.704,0.704 0 0 1 -0.122,0.832 z"
+       id="path57"
+       style="fill:#000000;fill-opacity:1" />
+  </g>
+</svg>
