@@ -36,3 +36,6 @@ tell application "Google Chrome"
         end repeat
     end repeat
 end tell
+
+# No rooms
+return "UNKNOWN"
