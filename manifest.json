@@ -5,14 +5,7 @@
       "Name": "Microphone",
       "States": [
         {
-          "Image": "active",
-          "TitleAlignment": "middle",
-          "FontSize": "17"
-        },
-        {
-          "Image": "muted",
-          "TitleAlignment": "middle",
-          "FontSize": "17"
+          "Image": "active"
         }
       ],
       "SupportedInMultiActions": false,

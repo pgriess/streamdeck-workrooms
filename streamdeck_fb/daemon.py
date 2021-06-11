@@ -1,16 +1,19 @@
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
+import base64
 import json
 from logging import FileHandler, INFO, basicConfig, error, getLogger, info, warn
 from logging.handlers import SysLogHandler
+import mimetypes
 import os
+import os.path
 import subprocess
 import sys
 import traceback
 import websockets
 
 
-async def hello(event, uuid, ws_url):
+async def hello(event, uuid, ws_url, muted_image, active_image):
     async with websockets.connect(ws_url) as ws:
         info('established websocket connection')
         out_msg = json.dumps({'event': event, 'uuid': uuid})
@@ -19,6 +22,7 @@ async def hello(event, uuid, ws_url):
 
         current_state = None
         context = None
+        retry_counter = 0
 
         while True:
             try:
@@ -44,19 +48,20 @@ async def hello(event, uuid, ws_url):
             except asyncio.TimeoutError:
                 out = subprocess.check_output('/Users/pgriess/src/pgriess-streamdeck-fb/query_mute_state.osa', encoding='utf-8').strip()
                 info('current state is {}'.format(out))
+                retry_counter += 1
 
-                if out != current_state:
+                if out != current_state or (retry_counter % 5) == 0:
                     info('current state changed from {} to {}'.format(current_state, out))
-
                     current_state = out
 
-                    out_jo = {'event': 'setState', 'context': context, 'payload': {}}
+                    out_jo = {'event': 'setImage', 'context': context, 'payload': {}}
                     if current_state == 'ACTIVE':
-                        out_jo['payload']['state'] = 0
+                        out_jo['payload']['image'] = active_image
                     elif current_state == 'MUTED':
-                        out_jo['payload']['state'] = 1
+                        out_jo['payload']['image'] = muted_image
                     else:
-                        pass
+                        # XXX XXX XXX XXX
+                        out_jo['payload']['image'] = active_image
 
                     out_msg = json.dumps(out_jo)
                     info('sending: {}'.format(out_msg))
@@ -66,6 +71,21 @@ async def hello(event, uuid, ws_url):
                 return
             except:
                 error(traceback.format_exc())
+
+
+def load_image_string(asset_name):
+    '''
+    Return a string-ified representation of the given asset, suitable for
+    passing to SD via setImage command.
+    '''
+
+    fp = os.path.join(os.path.curdir, asset_name)
+    mt, _ = mimetypes.guess_type(fp)
+    assert mt is not None
+
+    with open(fp, 'rb') as f:
+        content = base64.b64encode(f.read()).decode()
+        return 'data:{};base64,{}'.format(mt, content)
 
 
 def main():
@@ -96,5 +116,9 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
     ws_url = 'ws://127.0.0.1:{}'.format(args.port)
     info('connecting to {}'.format(ws_url))
 
+    # Load images that we need
+    muted_image = load_image_string('muted.png')
+    active_image = load_image_string('active.png')
+
     asyncio.get_event_loop().run_until_complete(
-        hello(args.registerEvent, args.pluginUUID, ws_url))
+        hello(args.registerEvent, args.pluginUUID, ws_url, muted_image, active_image))
