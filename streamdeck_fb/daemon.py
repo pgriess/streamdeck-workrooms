@@ -13,7 +13,7 @@ import traceback
 import websockets
 
 
-async def ws_client(event, uuid, ws_url, muted_image, active_image):
+async def ws_client(event, uuid, ws_url, muted_image, active_image, unknown_image):
     async with websockets.connect(ws_url) as ws:
         info('established websocket connection')
         out_msg = json.dumps({'event': event, 'uuid': uuid})
@@ -60,8 +60,7 @@ async def ws_client(event, uuid, ws_url, muted_image, active_image):
                     elif current_state == 'MUTED':
                         out_jo['payload']['image'] = muted_image
                     else:
-                        # XXX XXX XXX XXX
-                        out_jo['payload']['image'] = active_image
+                        out_jo['payload']['image'] = unknown_image
 
                     out_msg = json.dumps(out_jo)
                     info('sending: {}'.format(out_msg))
@@ -119,6 +118,7 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
     # Load images that we need
     muted_image = load_image_string('muted.png')
     active_image = load_image_string('active.png')
+    unknown_image = load_image_string('unknown.png')
 
     asyncio.get_event_loop().run_until_complete(
-        ws_client(args.registerEvent, args.pluginUUID, ws_url, muted_image, active_image))
+        ws_client(args.registerEvent, args.pluginUUID, ws_url, muted_image, active_image, unknown_image))

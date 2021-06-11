@@ -6,7 +6,7 @@ install:
 	mkdir $(PLUGIN_DIR)
 	cp manifest.json en.json \
 		env/bin/daemon \
-		active.png muted.png \
+		active.png muted.png unknown.png \
 		category.png "category@2x.png" \
 		plugin.png "plugin@2x.png" \
 		$(PLUGIN_DIR)
