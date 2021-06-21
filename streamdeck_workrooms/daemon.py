@@ -38,7 +38,9 @@ async def ws_client(event, uuid, ws_url, muted_image, active_image, unknown_imag
                         info('setting context to {}'.format(context))
 
                     if context != in_jo['context']:
-                        error('context changed from {} to {}'.format(context, in_jo['context']))
+                        if context is not None:
+                            error('context changed from {} to {}'.format(context, in_jo['context']))
+
                         context = in_jo['context']
 
                 if in_jo.get('event') == 'keyUp':
