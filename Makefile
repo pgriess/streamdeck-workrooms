@@ -1,25 +1,30 @@
+PLUGIN_ID=in.std.streamdeck.workrooms
+
 ROOT_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-SD_PLUGIN_DIR="$(HOME)/Library/Application Support/com.elgato.StreamDeck/Plugins"
-PLUGIN_DIR=$(SD_PLUGIN_DIR)/in.std.fb.sdPlugin
+BUILD_DIR=$(ROOT_DIR)/build
+DIST_DIR=$(ROOT_DIR)/dist
+
+PLUGIN_DIR=$(DIST_DIR)/$(PLUGIN_ID).sdPlugin
+PLUGIN_FILE=$(DIST_DIR)/$(PLUGIN_ID).streamDeckPlugin
+
 ASSETS=$(wildcard $(ROOT_DIR)/assets/*.png)
 BINARIES=$(wildcard $(ROOT_DIR)/bin/*)
 SOURCES=$(shell find $(ROOT_DIR)/streamdeck_workrooms -name '*.py')
 
-.PHONY: install clean
+.PHONY: clean
 
-$(ROOT_DIR)/dist/daemon: $(SOURCES)
+$(PLUGIN_FILE): $(DIST_DIR)/daemon $(ASSETS) $(BINARIES) $(ROOT_DIR)/manifest.json $(ROOT_DIR)/en.json
+	mkdir -p $(PLUGIN_DIR)
+	cp -f $^ $(PLUGIN_DIR)
+	rm -f $@
+	$(ROOT_DIR)/tools/DistributionTool -b -i $(PLUGIN_DIR) -o $$(dirname $@)
+
+$(DIST_DIR)/daemon: $(SOURCES)
+	mkdir -p $$(dirname $@)
 	$(ROOT_DIR)/env/bin/pyinstaller -Fc \
+		--collect-submodules=websockets \
 		-n $$(basename $@) --distpath=$$(dirname $@) \
 		./streamdeck_workrooms/daemon.py
 
-install:
-	rm -fr $(PLUGIN_DIR)
-	mkdir $(PLUGIN_DIR)
-	cp manifest.json en.json \
-		env/bin/daemon \
-		$(ASSETS) \
-		$(BINARIES) \
-		$(PLUGIN_DIR)
-
 clean:
-	rm -fr $(ROOT_DIR)/build $(ROOT_DIR)/dist
+	rm -fr $(BUILD_DIR) $(DIST_DIR)
