@@ -8,11 +8,16 @@
 ROOT_DIR=$(dirname "$0")
 
 set -e -u -o pipefail
-set -x
 
 # Stream Deck does not capture stderr, so log this to a well-known location for
 # debugging situations where the logMessage event cannot be sent or received.
 exec 2>>"$HOME"/Library/Logs/streamdeck-workrooms.log
+
+# Stream Deck seems to want to prevent executables other than what's explicitly
+# listed in CodePath. Fix up permissions.
+for fn in daemon query_mute_state.osa toggle_mute_state.osa ; do
+    chmod +x "$ROOT_DIR/$fn"
+done
 
 # Stream Deck does not support passing arguments, so we customize here.
 exec "$ROOT_DIR/daemon" -vv "$@"
