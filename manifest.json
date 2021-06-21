@@ -9,23 +9,28 @@
         }
       ],
       "SupportedInMultiActions": false,
-      "Tooltip": "This action toggles the microphone.",
-      "UUID": "in.std.fb.microphone"
+      "Tooltip": "Toggle the microphone",
+      "UUID": "in.std.streamdeck.workrooms.microphone"
     }
   ],
+  "SDKVersion": 2,
   "Author": "Peter Griess",
   "CodePathMac": "daemon_wrapper",
-  "Description": "Bindings for Facebook tools.",
+  "Description": "Actions for Facebook Workplace Rooms",
   "Category": "FB",
   "CategoryIcon": "category",
-  "Name": "Rooms",
+  "Name": "Workplace Rooms",
   "Icon": "plugin",
-  "URL": "https://github.com/pgriess",
+  "URL": "https://github.com/pgriess/streamdeck-workrooms",
   "Version": "0.1",
   "OS": [
     {
         "Platform": "mac",
         "MinimumVersion" : "10.11"
     }
-  ]
+  ],
+  "Software":
+  {
+    "MinimumVersion" : "4.1"
+  }
 }
