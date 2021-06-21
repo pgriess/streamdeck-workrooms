@@ -2,7 +2,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
 import base64
 import json
-from logging import FileHandler, INFO, basicConfig, error, getLogger, info, warn
+from logging import FileHandler, WARNING, basicConfig, error, getLogger, info, warn
 from logging.handlers import SysLogHandler
 import mimetypes
 import os
@@ -108,11 +108,8 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
     args = ap.parse_args()
 
     basicConfig(
-        style='{', format='{asctime} {message}', level=INFO - args.v * 10,
+        style='{', format='{asctime} {message}', level=WARNING - args.v * 10,
         stream=sys.stderr)
-
-    if not os.isatty(sys.stdout.fileno()):
-        getLogger().addHandler(FileHandler('/Users/pgriess/.streamdeck.log'))
 
     ws_url = 'ws://127.0.0.1:{}'.format(args.port)
     info('connecting to {}'.format(ws_url))

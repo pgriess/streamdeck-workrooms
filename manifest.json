@@ -14,7 +14,7 @@
     }
   ],
   "Author": "Peter Griess",
-  "CodePathMac": "daemon",
+  "CodePathMac": "daemon_wrapper",
   "Description": "Bindings for Facebook tools.",
   "Category": "FB",
   "CategoryIcon": "category",

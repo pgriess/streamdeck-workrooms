@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# Wrapper around the main 'daemon' Python script.
+#
+# This exists to work around some limitations in the Stream Deck plugin
+# environment.
+
+ROOT_DIR=$(dirname "$0")
+
+set -e -u -o pipefail
+set -x
+
+# Stream Deck does not capture stderr, so log this to a well-known location for
+# debugging situations where the logMessage event cannot be sent or received.
+exec 2>>"$HOME"/Library/Logs/streamdeck-workrooms.log
+
+# Stream Deck does not support passing arguments, so we customize here.
+exec "$ROOT_DIR/daemon" -vv "$@"
