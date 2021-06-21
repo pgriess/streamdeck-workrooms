@@ -121,3 +121,7 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
 
     asyncio.get_event_loop().run_until_complete(
         ws_client(args.registerEvent, args.pluginUUID, ws_url, muted_image, active_image, unknown_image))
+
+
+if __name__ == '__main__':
+    main()
