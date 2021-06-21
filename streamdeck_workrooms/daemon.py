@@ -43,10 +43,10 @@ async def ws_client(event, uuid, ws_url, muted_image, active_image, unknown_imag
 
                 if in_jo.get('event') == 'keyUp':
                     info('toggling mute state')
-                    subprocess.check_call('/Users/pgriess/src/pgriess-streamdeck-fb/toggle_mute_state.osa', encoding='utf-8')
+                    subprocess.check_call(os.path.join(os.path.curdir, 'toggle_mute_state.osa'), encoding='utf-8')
 
             except asyncio.TimeoutError:
-                out = subprocess.check_output('/Users/pgriess/src/pgriess-streamdeck-fb/query_mute_state.osa', encoding='utf-8').strip()
+                out = subprocess.check_output(os.path.join(os.path.curdir, 'query_mute_state.osa'), encoding='utf-8').strip()
                 info('current state is {}'.format(out))
                 retry_counter += 1
 
