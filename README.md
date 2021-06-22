@@ -7,3 +7,7 @@ Install virtual environment
 Install the package
 
     $ ./env/bin/pip install -e .
+
+Install PyInstall
+
+    $ ./env/bin/pip install pyinstall
