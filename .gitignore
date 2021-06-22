@@ -2,6 +2,7 @@ build/
 dist/
 env/
 *.egg-info/
+*.code-workspace
 *.swp
 *.pyc
 *.spec
