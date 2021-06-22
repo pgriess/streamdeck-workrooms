@@ -9,9 +9,9 @@
    id="svg997"
    sodipodi:docname="states.svg"
    inkscape:version="1.1 (c4e8f9e, 2021-05-24)"
-   inkscape:export-filename="/Users/pgriess/src/pgriess-streamdeck-workrooms/assets/state_microphone_unknown.png"
-   inkscape:export-xdpi="144"
-   inkscape:export-ydpi="144"
+   inkscape:export-filename="/Users/pgriess/src/pgriess-streamdeck-workrooms/assets/state_microphone_muted@2x.png"
+   inkscape:export-xdpi="288"
+   inkscape:export-ydpi="288"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -28,14 +28,14 @@
      inkscape:pagecheckerboard="0"
      showgrid="false"
      inkscape:zoom="5.6568542"
-     inkscape:cx="19.003495"
+     inkscape:cx="13.876971"
      inkscape:cy="24.837126"
      inkscape:window-width="1586"
      inkscape:window-height="997"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer7" />
+     inkscape:current-layer="layer3" />
   <g
      id="g985">
     <rect
@@ -58,25 +58,40 @@
      inkscape:groupmode="layer"
      id="layer1"
      inkscape:label="Background - Grey"
-     style="display:inline">
+     style="display:none">
     <circle
-       style="fill:#646464;stroke-width:0.822815"
+       style="fill:#646464;stroke-width:0.719963"
        id="path1677"
        cx="12"
        cy="12"
-       r="12" />
+       r="10.5" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Background - Light Grey"
+     style="display:none">
+    <circle
+       style="display:inline;fill:#969696;fill-opacity:1;stroke-width:0.719963"
+       id="path1677-8"
+       cx="12"
+       cy="12"
+       r="10.5"
+       inkscape:export-filename="/Users/pgriess/src/pgriess-streamdeck-workrooms/assets/action_microphone@2x.png"
+       inkscape:export-xdpi="80"
+       inkscape:export-ydpi="80" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="Background - Green"
-     style="display:none">
+     style="display:inline">
     <circle
-       style="display:inline;fill:#64af64;fill-opacity:1;stroke-width:0.822815"
+       style="display:inline;fill:#64af64;fill-opacity:1;stroke-width:0.719963"
        id="path1677-1"
        cx="12"
        cy="12"
-       r="12" />
+       r="10.5" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -84,17 +99,17 @@
      inkscape:label="Background - Red"
      style="display:none">
     <circle
-       style="display:inline;fill:#af6464;fill-opacity:1;stroke-width:0.822815"
+       style="display:inline;fill:#af6464;fill-opacity:1;stroke-width:0.719963"
        id="circle2586"
        cx="12"
        cy="12"
-       r="12" />
+       r="10.5" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Icon - On"
-     style="display:inline">
+     style="display:none">
     <g
        id="g995"
        transform="translate(0,0.5)">
@@ -103,13 +118,13 @@
       <g
          id="g993">
         <path
-           d="m 12,13.75625 c 1.49815,0 2.7075,-1.20935 2.7075,-2.7075 v -5.415 c 0,-1.49815 -1.20935,-2.7075 -2.7075,-2.7075 -1.49815,0 -2.7075,1.20935 -2.7075,2.7075 v 5.415 c 0,1.49815 1.20935,2.7075 2.7075,2.7075 z"
+           d="m 12,13.536266 c 1.352081,0 2.443519,-1.091439 2.443519,-2.443519 V 6.2057094 C 14.443519,4.853629 13.352081,3.7621906 12,3.7621906 c -1.352081,0 -2.4435187,1.0914384 -2.4435187,2.4435188 v 4.8870376 c 0,1.35208 1.0914387,2.443519 2.4435187,2.443519 z"
            id="path989"
-           style="stroke-width:0.9025" />
+           style="stroke-width:0.814506" />
         <path
-           d="m 16.5125,11.04875 c 0,2.4909 -2.0216,4.5125 -4.5125,4.5125 -2.4909,0 -4.5125,-2.0216 -4.5125,-4.5125 h -1.805 c 0,3.185825 2.355525,5.803075 5.415,6.2453 v 2.7797 h 1.805 v -2.7797 c 3.059475,-0.442225 5.415,-3.059475 5.415,-6.2453 z"
+           d="m 16.072531,11.092747 c 0,2.248038 -1.824494,4.072532 -4.072531,4.072532 -2.2480373,0 -4.0725313,-1.824494 -4.0725313,-4.072532 H 6.2984562 c 0,2.875207 2.1258614,5.237275 4.8870378,5.636384 v 2.508679 h 1.629012 v -2.508679 c 2.761176,-0.399109 4.887038,-2.761177 4.887038,-5.636384 z"
            id="path991"
-           style="stroke-width:0.9025" />
+           style="stroke-width:0.814506" />
       </g>
     </g>
   </g>
@@ -119,9 +134,9 @@
      inkscape:label="Icon - Off"
      style="display:none">
     <path
-       d="m 10.8448,6.034475 c 0,-0.59565 0.48735,-1.083 1.083,-1.083 0.59565,0 1.083,0.48735 1.083,1.083 l -0.009,3.528775 1.633525,1.615475 v -5.054 c 0,-1.49815 -1.20935,-2.7075 -2.7075,-2.7075 -1.38985,0 -2.517975,1.0469 -2.6714,2.391625 l 1.5884,1.5884 z m 7.4005,5.50525 h -1.53425 c 0,0.52345 -0.09025,1.019825 -0.243675,1.4801 L 17.61355,14.166 c 0.3971,-0.7942 0.63175,-1.687675 0.63175,-2.626275 z M 5.077825,4.193375 3.8053,5.4659 l 5.415,5.415 v 0.658825 c 0,1.49815 1.20935,2.7075 2.7075,2.7075 0.207575,0 0.3971,-0.02707 0.586625,-0.0722 l 1.49815,1.49815 c -0.640775,0.297825 -1.35375,0.4693 -2.084775,0.4693 -2.4909,0 -4.78325,-1.89525 -4.78325,-4.60275 H 5.6103 c 0,3.077525 2.4548,5.622575 5.415,6.0648 v 2.9602 h 1.805 v -2.9602 c 0.821275,-0.117325 1.597425,-0.406125 2.301375,-0.81225 l 3.7905,3.7905 1.272525,-1.272525 z"
+       d="m 10.957432,6.6161136 c 0,-0.5375741 0.439833,-0.9774075 0.977407,-0.9774075 0.537574,0 0.977408,0.4398334 0.977408,0.9774075 l -0.0081,3.1847195 1.474257,1.4579669 V 6.6975643 c 0,-1.3520804 -1.091439,-2.4435188 -2.443519,-2.4435188 -1.25434,0 -2.2724729,0.9448273 -2.410939,2.1584416 l 1.433531,1.433531 z m 6.678951,4.9684884 h -1.384661 c 0,0.472413 -0.08145,0.920391 -0.219916,1.33579 l 1.034422,1.034423 c 0.358383,-0.716766 0.570155,-1.523126 0.570155,-2.370213 z M 5.752737,4.9545209 4.6042833,6.1029747 9.4913208,10.990012 v 0.59459 c 0,1.35208 1.0914382,2.443519 2.4435182,2.443519 0.187337,0 0.358383,-0.02443 0.52943,-0.06516 l 1.35208,1.35208 c -0.5783,0.268787 -1.221759,0.423543 -1.88151,0.423543 -2.2480367,0 -4.3168826,-1.710462 -4.3168826,-4.153981 H 6.2332958 c 0,2.777466 2.215457,5.074374 4.8870372,5.473482 v 2.671581 h 1.629013 v -2.671581 c 0.7412,-0.105886 1.441676,-0.366528 2.07699,-0.733056 l 3.420927,3.420926 1.148454,-1.148453 z"
        id="path1062"
-       style="stroke-width:0.9025" />
+       style="stroke-width:0.814506" />
   </g>
   <g
      inkscape:groupmode="layer"

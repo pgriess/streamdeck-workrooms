@@ -115,9 +115,9 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
     info('connecting to {}'.format(ws_url))
 
     # Load images that we need
-    muted_image = load_image_string('muted.png')
-    active_image = load_image_string('active.png')
-    unknown_image = load_image_string('unknown.png')
+    muted_image = load_image_string('state_microphone_muted.png')
+    active_image = load_image_string('state_microphone_active.png')
+    unknown_image = load_image_string('state_microphone_unknown.png')
 
     asyncio.get_event_loop().run_until_complete(
         ws_client(args.registerEvent, args.pluginUUID, ws_url, muted_image, active_image, unknown_image))
