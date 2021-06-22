@@ -4,7 +4,7 @@ ROOT_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BUILD_DIR=$(ROOT_DIR)/build
 DIST_DIR=$(ROOT_DIR)/dist
 
-PLUGIN_DIR=$(DIST_DIR)/$(PLUGIN_ID).sdPlugin
+PLUGIN_DIR=$(BUILD_DIR)/$(PLUGIN_ID).sdPlugin
 PLUGIN_FILE=$(DIST_DIR)/$(PLUGIN_ID).streamDeckPlugin
 
 ASSETS=$(wildcard $(ROOT_DIR)/assets/*.png)
