@@ -1,11 +1,11 @@
 {
   "Actions": [
     {
-      "Icon": "plugin",
+      "Icon": "action_microphone",
       "Name": "Microphone",
       "States": [
         {
-          "Image": "unknown"
+          "Image": "state_microphone_unknown"
         }
       ],
       "SupportedInMultiActions": false,
@@ -17,10 +17,10 @@
   "Author": "Peter Griess",
   "CodePathMac": "daemon_wrapper",
   "Description": "Actions for Facebook Workplace Rooms",
-  "Category": "FB",
+  "Category": "Workplace Rooms",
   "CategoryIcon": "category",
   "Name": "Workplace Rooms",
-  "Icon": "plugin",
+  "Icon": "store",
   "URL": "https://github.com/pgriess/streamdeck-workrooms",
   "Version": "0.1",
   "OS": [
