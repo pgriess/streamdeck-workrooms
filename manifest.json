@@ -1,16 +1,16 @@
 {
   "Actions": [
     {
-      "Icon": "action_microphone",
+      "Icon": "action_mic",
       "Name": "Microphone",
       "States": [
         {
-          "Image": "state_microphone_unknown"
+          "Image": "state_mic_unknown"
         }
       ],
       "SupportedInMultiActions": false,
       "Tooltip": "Toggle the microphone",
-      "UUID": "in.std.streamdeck.workrooms.microphone"
+      "UUID": "in.std.streamdeck.workrooms.mic"
     }
   ],
   "SDKVersion": 2,

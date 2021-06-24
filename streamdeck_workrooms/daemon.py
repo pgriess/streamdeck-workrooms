@@ -12,7 +12,7 @@ import websockets
 
 
 # Task to poll for Workrooms state
-async def state_poll(ws, context, muted_image, active_image, unknown_image):
+async def state_poll(ws, context, off_image, on_image, unknown_image):
     current_state = None
 
     while True:
@@ -30,9 +30,9 @@ async def state_poll(ws, context, muted_image, active_image, unknown_image):
 
         msg = {'event': 'setImage', 'context': context, 'payload': {}}
         if current_state == 'OFF':
-            msg['payload']['image'] = muted_image
+            msg['payload']['image'] = off_image
         elif current_state == 'ON':
-            msg['payload']['image'] = active_image
+            msg['payload']['image'] = on_image
         else:
             msg['payload']['image'] = unknown_image
 
@@ -89,9 +89,9 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         stream=sys.stderr)
 
     # Load images that we need
-    muted_image = load_image_string('state_microphone_muted.png')
-    active_image = load_image_string('state_microphone_active.png')
-    unknown_image = load_image_string('state_microphone_unknown.png')
+    off_image = load_image_string('state_mic_off.png')
+    on_image = load_image_string('state_mic_on.png')
+    unknown_image = load_image_string('state_mic_unknown.png')
 
     async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws:
         info('established websocket connection')
@@ -115,7 +115,7 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         await asyncio.wait(
             [
                 sd_listen(ws),
-                state_poll(ws, context, muted_image, active_image, unknown_image),
+                state_poll(ws, context, off_image, on_image, unknown_image),
             ],
             return_when=asyncio.FIRST_EXCEPTION)
 
