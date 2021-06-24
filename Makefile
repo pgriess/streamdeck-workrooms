@@ -30,6 +30,7 @@ $(DIST_DIR)/daemon: $(SOURCES)
 # this with the '|| true' clause
 install: $(PLUGIN_FILE)
 	osascript -e 'tell application "Stream Deck" to quit' || true
+	sleep 3
 	rm -fr "$${HOME}/Library/Application Support/com.elgato.StreamDeck/Plugins/$(PLUGIN_ID).sdPlugin"
 	open $(PLUGIN_FILE)
 
