@@ -10,13 +10,19 @@ import subprocess
 import sys
 import websockets
 
+context_mic = None
+
 
 # Task to poll for Workrooms state
-async def state_poll(ws, context, off_image, on_image, unknown_image):
+async def state_poll(ws, off_image, on_image, unknown_image):
     current_state = None
 
     while True:
         await asyncio.sleep(1)
+
+        # Nothing to do if we don't have an active context
+        if context_mic is None:
+            continue
 
         out = subprocess.check_output(
             [os.path.join(os.path.curdir, 'query_browser_state.osa'), 'mic'],
@@ -28,7 +34,7 @@ async def state_poll(ws, context, off_image, on_image, unknown_image):
         info('current state changed from {} to {}'.format(current_state, out))
         current_state = out
 
-        msg = {'event': 'setImage', 'context': context, 'payload': {}}
+        msg = {'event': 'setImage', 'context': context_mic, 'payload': {}}
         if current_state == 'OFF':
             msg['payload']['image'] = off_image
         elif current_state == 'ON':
@@ -41,10 +47,23 @@ async def state_poll(ws, context, off_image, on_image, unknown_image):
 
 # Task to listen to Stream Deck commands
 async def sd_listen(ws):
+    global context_mic
+
     while True:
         msg = json.loads(await ws.recv())
+        event = msg.get('event')
 
-        if msg.get('event') == 'keyUp':
+        if event == 'willAppear':
+            action = msg['action']
+            if action == 'in.std.streamdeck.workrooms.mic':
+                context_mic = msg['context']
+
+        if event == 'willDissappear':
+            action = msg['action']
+            if action == 'in.std.streamdeck.workrooms.mic':
+                context_mic = None
+
+        if event == 'keyUp':
             info('toggling mute state')
             subprocess.check_call(
                 [os.path.join(os.path.curdir, 'toggle_browser_state.osa'), 'mic'],
@@ -100,22 +119,11 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         msg = json.dumps({'event': args.registerEvent, 'uuid': args.pluginUUID})
         await ws.send(msg)
 
-        # Wait for a handshaking message to come back to set up our context
-        context = None
-        while context is None: 
-            msg = json.loads(await ws.recv())
-
-            # Track the current context value
-            if 'context' not in msg:
-                continue
-
-            context = msg['context']
-
         # Listen for events from Stream Deck
         await asyncio.wait(
             [
                 sd_listen(ws),
-                state_poll(ws, context, off_image, on_image, unknown_image),
+                state_poll(ws, off_image, on_image, unknown_image),
             ],
             return_when=asyncio.FIRST_EXCEPTION)
 
