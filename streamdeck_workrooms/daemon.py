@@ -2,14 +2,12 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
 import base64
 import json
-from logging import FileHandler, WARNING, basicConfig, error, getLogger, info, warn
-from logging.handlers import SysLogHandler
+from logging import WARNING, basicConfig, info
 import mimetypes
 import os
 import os.path
 import subprocess
 import sys
-import traceback
 import websockets
 
 
@@ -112,7 +110,6 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
                 continue
 
             context = msg['context']
-            info('setting context to {}'.format(context))
 
         # Listen for events from Stream Deck
         await asyncio.wait(
