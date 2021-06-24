@@ -2,12 +2,13 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
 import base64
 import json
-from logging import ERROR, basicConfig, info
+from logging import ERROR, basicConfig, error, info
 import mimetypes
 import os
 import os.path
 import subprocess
 import sys
+import traceback
 import websockets
 
 action_metadata = {
@@ -33,9 +34,15 @@ async def state_poll(ws, on_images, off_images, unknown_images, none_images):
     while True:
         await asyncio.sleep(1)
 
-        out = subprocess.check_output(
-            [os.path.join(os.path.curdir, 'query_browser_state.osa'), 'mic'],
-            encoding='utf-8').strip()
+        out = None
+        try:
+            out = subprocess.check_output(
+                [os.path.join(os.path.curdir, 'query_browser_state.osa'), 'mic'],
+                encoding='utf-8').strip()
+        except subprocess.CalledProcessError:
+            error(traceback.format_exc())
+            out = 'NONE NONE NONE'
+
         next_states_array = out.split(' ')
 
         for name, data in action_metadata.items():
@@ -97,9 +104,12 @@ async def sd_listen(ws):
 
         if event == 'keyUp':
             info('toggling {} state'.format(action))
-            subprocess.check_call(
-                [os.path.join(os.path.curdir, 'toggle_browser_state.osa'), action],
-                encoding='utf-8')
+            try:
+                subprocess.check_call(
+                    [os.path.join(os.path.curdir, 'toggle_browser_state.osa'), action],
+                    encoding='utf-8')
+            except subprocess.CalledProcessError:
+                error(traceback.format_exc())
 
 
 def load_image_string(asset_name):
