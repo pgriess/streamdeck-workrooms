@@ -19,7 +19,7 @@ on run argv
         repeat with w in windows
             repeat with t in tabs of w
                 # TODO: Handle multiple tabs with calls. Only one should be active.
-                if title of t is "Workplace Room" then
+                if (offset of "/LINK:" in (URL of t as string)) is not 0 then
                     tell t
                         # The set of buttons can be different, e.g. index 4 on the
                         # call I'm currently on is video, not audio. Click all of
