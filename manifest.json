@@ -5,7 +5,7 @@
       "Name": "Microphone",
       "States": [
         {
-          "Image": "state_mic_unknown"
+          "Image": "state_mic_none"
         }
       ],
       "SupportedInMultiActions": false,
@@ -17,7 +17,7 @@
       "Name": "Camera",
       "States": [
         {
-          "Image": "state_camera_unknown"
+          "Image": "state_camera_none"
         }
       ],
       "SupportedInMultiActions": false,
@@ -29,7 +29,7 @@
       "Name": "Hand",
       "States": [
         {
-          "Image": "state_hand_unknown"
+          "Image": "state_hand_none"
         }
       ],
       "SupportedInMultiActions": false,

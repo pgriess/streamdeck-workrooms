@@ -9,9 +9,9 @@
    id="svg997"
    sodipodi:docname="states.svg"
    inkscape:version="1.1 (c4e8f9e, 2021-05-24)"
-   inkscape:export-filename="/Users/pgriess/src/pgriess-streamdeck-workrooms/assets/state_mic_unknown@2x.png"
-   inkscape:export-xdpi="288"
-   inkscape:export-ydpi="288"
+   inkscape:export-filename="/Users/pgriess/src/pgriess-streamdeck-workrooms/assets/state_mic_none.png"
+   inkscape:export-xdpi="144"
+   inkscape:export-ydpi="144"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +35,7 @@
      inkscape:window-x="525"
      inkscape:window-y="528"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer6" />
+     inkscape:current-layer="layer2" />
   <g
      id="g985">
     <rect
@@ -58,10 +58,22 @@
      inkscape:groupmode="layer"
      id="layer1"
      inkscape:label="Background - Grey"
-     style="display:inline">
+     style="display:none">
     <circle
        style="fill:#646464;stroke-width:0.719963"
        id="path1677"
+       cx="12"
+       cy="12"
+       r="10.5" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g3015"
+     inkscape:label="Background - Dark Grey"
+     style="display:inline">
+    <circle
+       style="fill:#323232;stroke-width:0.719963;fill-opacity:1"
+       id="circle3013"
        cx="12"
        cy="12"
        r="10.5" />
@@ -198,7 +210,7 @@
      inkscape:groupmode="layer"
      id="layer6"
      inkscape:label="Badge - Unknown"
-     style="display:inline">
+     style="display:none">
     <circle
        style="fill:#c62727;fill-opacity:1;stroke-width:0.5"
        id="path5624"

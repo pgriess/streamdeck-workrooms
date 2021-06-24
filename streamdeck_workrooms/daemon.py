@@ -29,7 +29,7 @@ action_metadata = {
 }
 
 # Task to poll for Workrooms state
-async def state_poll(ws, on_images, off_images, unknown_images):
+async def state_poll(ws, on_images, off_images, unknown_images, none_images):
     while True:
         await asyncio.sleep(1)
 
@@ -59,6 +59,8 @@ async def state_poll(ws, on_images, off_images, unknown_images):
                 msg['payload']['image'] = off_images[index]
             elif next_state == 'ON':
                 msg['payload']['image'] = on_images[index]
+            elif next_state == 'NONE':
+                msg['payload']['image'] = none_images[index]
             else:
                 msg['payload']['image'] = unknown_images[index]
 
@@ -153,6 +155,11 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         load_image_string('state_camera_unknown.png'),
         load_image_string('state_hand_unknown.png'),
     ]
+    none_images = [
+        load_image_string('state_mic_none.png'),
+        load_image_string('state_camera_none.png'),
+        load_image_string('state_hand_none.png'),
+    ]
 
     async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws:
         info('established websocket connection')
@@ -165,7 +172,7 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         done_tasks, pending_tasks = await asyncio.wait(
             [
                 sd_listen(ws),
-                state_poll(ws, on_images, off_images, unknown_images),
+                state_poll(ws, on_images, off_images, unknown_images, none_images),
             ],
             return_when=asyncio.FIRST_EXCEPTION)
 
