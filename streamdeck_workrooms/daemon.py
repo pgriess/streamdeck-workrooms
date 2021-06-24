@@ -13,65 +13,40 @@ import traceback
 import websockets
 
 
-async def ws_client(event, uuid, ws_url, muted_image, active_image, unknown_image):
-    async with websockets.connect(ws_url) as ws:
-        info('established websocket connection')
-        out_msg = json.dumps({'event': event, 'uuid': uuid})
-        info('sending: {}'.format(out_msg))
-        await ws.send(out_msg)
+# Task to poll for Workrooms state
+async def state_poll(ws, context, muted_image, active_image, unknown_image):
+    current_state = None
 
-        current_state = None
-        context = None
-        retry_counter = 0
+    while True:
+        await asyncio.sleep(1)
 
-        while True:
-            try:
-                in_msg = await asyncio.wait_for(ws.recv(), 1)
-                info('received: {}'.format(in_msg))
+        out = subprocess.check_output(os.path.join(os.path.curdir, 'query_mute_state.osa'), encoding='utf-8').strip()
 
-                in_jo = json.loads(in_msg)
+        if out == current_state:
+            continue
 
-                # Track the current context value
-                if 'context' in in_jo:
-                    if context is None:
-                        context = in_jo['context']
-                        info('setting context to {}'.format(context))
+        info('current state changed from {} to {}'.format(current_state, out))
+        current_state = out
 
-                    if context != in_jo['context']:
-                        if context is not None:
-                            error('context changed from {} to {}'.format(context, in_jo['context']))
+        msg = {'event': 'setImage', 'context': context, 'payload': {}}
+        if current_state == 'MUTED':
+            msg['payload']['image'] = muted_image
+        elif current_state == 'ACTIVE':
+            msg['payload']['image'] = active_image
+        else:
+            msg['payload']['image'] = unknown_image
 
-                        context = in_jo['context']
+        await ws.send(json.dumps(msg))
 
-                if in_jo.get('event') == 'keyUp':
-                    info('toggling mute state')
-                    subprocess.check_call(os.path.join(os.path.curdir, 'toggle_mute_state.osa'), encoding='utf-8')
 
-            except asyncio.TimeoutError:
-                out = subprocess.check_output(os.path.join(os.path.curdir, 'query_mute_state.osa'), encoding='utf-8').strip()
-                info('current state is {}'.format(out))
-                retry_counter += 1
+# Task to listen to Stream Deck commands
+async def sd_listen(ws):
+    while True:
+        msg = json.loads(await ws.recv())
 
-                if out != current_state or (retry_counter % 5) == 0:
-                    info('current state changed from {} to {}'.format(current_state, out))
-                    current_state = out
-
-                    out_jo = {'event': 'setImage', 'context': context, 'payload': {}}
-                    if current_state == 'ACTIVE':
-                        out_jo['payload']['image'] = active_image
-                    elif current_state == 'MUTED':
-                        out_jo['payload']['image'] = muted_image
-                    else:
-                        out_jo['payload']['image'] = unknown_image
-
-                    out_msg = json.dumps(out_jo)
-                    info('sending: {}'.format(out_msg))
-                    await ws.send(out_msg)
-            except websockets.exceptions.ConnectionClosedOK:
-                info('ws server disconnected; exiting')
-                return
-            except:
-                error(traceback.format_exc())
+        if msg.get('event') == 'keyUp':
+            info('toggling mute state')
+            subprocess.check_call(os.path.join(os.path.curdir, 'toggle_mute_state.osa'), encoding='utf-8')
 
 
 def load_image_string(asset_name):
@@ -89,7 +64,7 @@ def load_image_string(asset_name):
         return 'data:{};base64,{}'.format(mt, content)
 
 
-def main():
+async def main():
     ap = ArgumentParser(
         description='''
 Command handler for an Elgato Stream Deck plugin for Facebook actions.
@@ -111,17 +86,37 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         style='{', format='{asctime} {message}', level=WARNING - args.v * 10,
         stream=sys.stderr)
 
-    ws_url = 'ws://127.0.0.1:{}'.format(args.port)
-    info('connecting to {}'.format(ws_url))
-
     # Load images that we need
     muted_image = load_image_string('state_microphone_muted.png')
     active_image = load_image_string('state_microphone_active.png')
     unknown_image = load_image_string('state_microphone_unknown.png')
 
-    asyncio.get_event_loop().run_until_complete(
-        ws_client(args.registerEvent, args.pluginUUID, ws_url, muted_image, active_image, unknown_image))
+    async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws:
+        info('established websocket connection')
 
+        # Send the handshaking message back
+        msg = json.dumps({'event': args.registerEvent, 'uuid': args.pluginUUID})
+        await ws.send(msg)
+
+        # Wait for a handshaking message to come back to set up our context
+        context = None
+        while context is None: 
+            msg = json.loads(await ws.recv())
+
+            # Track the current context value
+            if 'context' not in msg:
+                continue
+
+            context = msg['context']
+            info('setting context to {}'.format(context))
+
+        # Listen for events from Stream Deck
+        await asyncio.wait(
+            [
+                sd_listen(ws),
+                state_poll(ws, context, muted_image, active_image, unknown_image),
+            ],
+            return_when=asyncio.FIRST_EXCEPTION)
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
