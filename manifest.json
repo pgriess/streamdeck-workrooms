@@ -11,6 +11,18 @@
       "SupportedInMultiActions": false,
       "Tooltip": "Toggle the microphone",
       "UUID": "in.std.streamdeck.workrooms.mic"
+    },
+    {
+      "Icon": "action_camera",
+      "Name": "Camera",
+      "States": [
+        {
+          "Image": "state_camera_unknown"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "Toggle the camera",
+      "UUID": "in.std.streamdeck.workrooms.camera"
     }
   ],
   "SDKVersion": 2,

@@ -70,22 +70,28 @@ async def sd_listen(ws):
         msg = json.loads(await ws.recv())
         event = msg.get('event')
 
+        # I'm not sure why this could happen, but all messages that we currently
+        # handle require it, so just check up-front
+        if 'action' not in msg:
+            continue
+
+        action = msg['action'].split('.')[-1]
+
         # XXX: This assumes that we only have one action of a given type
         #      active at once. I don't think that is actually the case.
         if event == 'willAppear' or event == 'willDissappear':
             context = msg['context']
-            short_action = msg['action'].split('.')[-1]
 
             if event == 'willAppear':
-                action_metadata[short_action]['context'] = context
+                action_metadata[action]['context'] = context
             else:
-                action_metadata[short_action]['context'] = None
-                action_metadata[short_action]['state'] = None
+                action_metadata[action]['context'] = None
+                action_metadata[action]['state'] = None
 
         if event == 'keyUp':
-            info('toggling mute state')
+            info('toggling {} state'.format(action))
             subprocess.check_call(
-                [os.path.join(os.path.curdir, 'toggle_browser_state.osa'), 'mic'],
+                [os.path.join(os.path.curdir, 'toggle_browser_state.osa'), action],
                 encoding='utf-8')
 
 
@@ -127,9 +133,18 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         stream=sys.stderr)
 
     # Load images that we need
-    off_image = load_image_string('state_mic_off.png')
-    on_image = load_image_string('state_mic_on.png')
-    unknown_image = load_image_string('state_mic_unknown.png')
+    on_images = [
+        load_image_string('state_mic_on.png'),
+        load_image_string('state_camera_on.png'),
+    ]
+    off_images = [
+        load_image_string('state_mic_off.png'),
+        load_image_string('state_camera_off.png'),
+    ]
+    unknown_images = [
+        load_image_string('state_mic_unknown.png'),
+        load_image_string('state_camera_unknown.png'),
+    ]
 
     async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws:
         info('established websocket connection')
@@ -142,7 +157,7 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         await asyncio.wait(
             [
                 sd_listen(ws),
-                state_poll(ws, [on_image], [off_image], [unknown_image]),
+                state_poll(ws, on_images, off_images, unknown_images),
             ],
             return_when=asyncio.FIRST_EXCEPTION)
 
