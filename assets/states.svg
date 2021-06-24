@@ -9,9 +9,9 @@
    id="svg997"
    sodipodi:docname="states.svg"
    inkscape:version="1.1 (c4e8f9e, 2021-05-24)"
-   inkscape:export-filename="/Users/pgriess/src/pgriess-streamdeck-workrooms/assets/action_hand.png"
-   inkscape:export-xdpi="40"
-   inkscape:export-ydpi="40"
+   inkscape:export-filename="/Users/pgriess/src/pgriess-streamdeck-workrooms/assets/state_mic_unknown@2x.png"
+   inkscape:export-xdpi="288"
+   inkscape:export-ydpi="288"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -27,13 +27,13 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      showgrid="false"
-     inkscape:zoom="5.6568542"
-     inkscape:cx="-7.7781747"
-     inkscape:cy="24.837126"
+     inkscape:zoom="16.9375"
+     inkscape:cx="24"
+     inkscape:cy="24"
      inkscape:window-width="1586"
      inkscape:window-height="997"
-     inkscape:window-x="988"
-     inkscape:window-y="553"
+     inkscape:window-x="525"
+     inkscape:window-y="528"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer6" />
   <g
@@ -58,7 +58,7 @@
      inkscape:groupmode="layer"
      id="layer1"
      inkscape:label="Background - Grey"
-     style="display:none">
+     style="display:inline">
     <circle
        style="fill:#646464;stroke-width:0.719963"
        id="path1677"
@@ -95,6 +95,18 @@
   </g>
   <g
      inkscape:groupmode="layer"
+     id="g949"
+     inkscape:label="Background - White"
+     style="display:none">
+    <circle
+       style="display:inline;fill:#f0f0f0;fill-opacity:1;stroke-width:0.719963"
+       id="circle947"
+       cx="12"
+       cy="12"
+       r="10.5" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
      id="g2588"
      inkscape:label="Background - Red"
      style="display:none">
@@ -109,7 +121,7 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Icon - Mic On"
-     style="display:none">
+     style="display:inline">
     <g
        id="g995"
        transform="translate(0,0.5)">
@@ -186,9 +198,9 @@
      inkscape:groupmode="layer"
      id="layer6"
      inkscape:label="Badge - Unknown"
-     style="display:none">
+     style="display:inline">
     <circle
-       style="fill:#afafaf;fill-opacity:1;stroke-width:0.5"
+       style="fill:#c62727;fill-opacity:1;stroke-width:0.5"
        id="path5624"
        cx="17.998291"
        cy="18.05895"
@@ -207,11 +219,11 @@
      inkscape:label="Badge - Error"
      style="display:none">
     <circle
-       style="display:inline;fill:#afafaf;fill-opacity:1;stroke-width:0.5"
-       id="path5624-0"
-       cx="18.031223"
-       cy="17.942837"
-       r="4.6845822" />
+       style="fill:#c62727;fill-opacity:1;stroke-width:0.5"
+       id="path1447"
+       cx="18.00738"
+       cy="17.918819"
+       r="4.5166054" />
     <path
        d="m 17.5,19.44194 h 1 v 1 h -1 z m 0,-4 h 1 v 3 h -1 z m 0.495,-2.5 c -2.76,0 -4.995,2.24 -4.995,5 0,2.76 2.235,5 4.995,5 2.765,0 5.005,-2.24 5.005,-5 0,-2.76 -2.24,-5 -5.005,-5 z m 0.005,9 c -2.21,0 -4,-1.79 -4,-4 0,-2.21 1.79,-4 4,-4 2.21,0 4,1.79 4,4 0,2.21 -1.79,4 -4,4 z"
        id="path824"
@@ -219,10 +231,5 @@
       <desc
          id="desc991">Derived from https://developers.google.com/fonts/, where icons are licensed under the Apache License 2.0. There is no LICENSE file listing Google or whoever the license-holder is; they just link to the generic ALv2 URL.</desc>
     </path>
-    <path
-       style="fill:#dabe21;fill-opacity:1;stroke-width:0.176777"
-       d="m 34.490606,43.649418 c -2.350401,-0.461591 -4.525361,-2.196897 -5.60628,-4.473004 -2.234295,-4.704791 0.689662,-10.171692 5.934419,-11.095538 3.257584,-0.573812 6.718798,1.272404 8.270122,4.411296 0.650892,1.316991 0.663365,1.380628 0.663365,3.384329 0,1.930911 -0.03081,2.107153 -0.565941,3.236851 -0.772758,1.631354 -2.100581,2.99447 -3.663505,3.760875 -1.82317,0.894022 -3.282446,1.118819 -5.03218,0.775191 z m 2.6325,-3.794708 v -1.157484 l -1.104854,0.05263 -1.104854,0.05263 -0.05477,0.861422 c -0.08139,1.280228 -0.02091,1.348287 1.198268,1.348287 h 1.066208 z m 0,-6.010408 v -3.102027 l -1.104854,0.05263 -1.104854,0.05263 -0.04887,2.821331 c -0.02688,1.551732 -0.0095,2.923961 0.03865,3.049398 0.05808,0.151355 0.446141,0.228067 1.153726,0.228067 h 1.066208 z"
-       id="path968"
-       transform="scale(0.5)" />
   </g>
 </svg>
