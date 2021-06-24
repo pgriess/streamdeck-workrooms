@@ -10,45 +10,56 @@ import subprocess
 import sys
 import websockets
 
-context_mic = None
-
+action_metadata = {
+    'mic': {
+        'index': 0,
+        'context': None,
+        'state': None,
+    },
+    'camera': {
+        'index': 1,
+        'context': None,
+        'state': None,
+    },
+}
 
 # Task to poll for Workrooms state
-async def state_poll(ws, off_image, on_image, unknown_image):
-    # These constants must match query.js
-    MIC_INDEX = 0
-
-    current_state = [None, None]
-
+async def state_poll(ws, on_images, off_images, unknown_images):
     while True:
         await asyncio.sleep(1)
-
-        # Nothing to do if we don't have an active context
-        if context_mic is None:
-            continue
 
         out = subprocess.check_output(
             [os.path.join(os.path.curdir, 'query_browser_state.osa'), 'mic'],
             encoding='utf-8').strip()
-        next_state = out.split(' ')
+        next_states_array = out.split(' ')
 
-        if next_state == current_state:
-            continue
+        for name, data in action_metadata.items():
+            index = data['index']
+            context = data['context']
+            current_state = data['state']
+            next_state = next_states_array[index]
 
-        info('state changed from {} to {}'.format(current_state, next_state))
+            # Nothing has changed; don't update
+            if current_state == next_state:
+                continue
 
-        if current_state[MIC_INDEX] != next_state[MIC_INDEX]:
-            msg = {'event': 'setImage', 'context': context_mic, 'payload': {}}
-            if next_state[MIC_INDEX] == 'OFF':
-                msg['payload']['image'] = off_image
-            elif next_state[MIC_INDEX] == 'ON':
-                msg['payload']['image'] = on_image
+            # We have no context; don't update
+            if context is None:
+                continue
+
+            info('{} state changed from {} to {}'.format(name, current_state, next_state))
+
+            msg = {'event': 'setImage', 'context': context, 'payload': {}}
+            if next_state == 'OFF':
+                msg['payload']['image'] = off_images[index]
+            elif next_state == 'ON':
+                msg['payload']['image'] = on_images[index]
             else:
-                msg['payload']['image'] = unknown_image
+                msg['payload']['image'] = unknown_images[index]
 
             await ws.send(json.dumps(msg))
 
-        current_state = next_state
+            data['state'] = next_state
 
 
 # Task to listen to Stream Deck commands
@@ -59,15 +70,17 @@ async def sd_listen(ws):
         msg = json.loads(await ws.recv())
         event = msg.get('event')
 
-        if event == 'willAppear':
-            action = msg['action']
-            if action == 'in.std.streamdeck.workrooms.mic':
-                context_mic = msg['context']
+        # XXX: This assumes that we only have one action of a given type
+        #      active at once. I don't think that is actually the case.
+        if event == 'willAppear' or event == 'willDissappear':
+            context = msg['context']
+            short_action = msg['action'].split('.')[-1]
 
-        if event == 'willDissappear':
-            action = msg['action']
-            if action == 'in.std.streamdeck.workrooms.mic':
-                context_mic = None
+            if event == 'willAppear':
+                action_metadata[short_action]['context'] = context
+            else:
+                action_metadata[short_action]['context'] = None
+                action_metadata[short_action]['state'] = None
 
         if event == 'keyUp':
             info('toggling mute state')
@@ -129,7 +142,7 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         await asyncio.wait(
             [
                 sd_listen(ws),
-                state_poll(ws, off_image, on_image, unknown_image),
+                state_poll(ws, [on_image], [off_image], [unknown_image]),
             ],
             return_when=asyncio.FIRST_EXCEPTION)
 
