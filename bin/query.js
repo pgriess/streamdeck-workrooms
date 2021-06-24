@@ -4,22 +4,31 @@
 // queries per tick.
 () => {
     let micText = Array.from(document.querySelectorAll('button'))
-        .filter((n) => { return n.textContent.match(/mute/i); })
+        .filter((n) => { return n.textContent.match(/microphone/i); })
         .map((n) => { return n.textContent; })
         .join('');
     let micState =
-        (micText === "Unmute Microphone") ? "OFF" :
-        (micText === "Mute Microphone") ? "ON" :
+        (micText === "Unmute microphone") ? "OFF" :
+        (micText === "Mute microphone") ? "ON" :
         "UNKNOWN";
 
     let cameraText = Array.from(document.querySelectorAll('button'))
-        .filter((n) => { return n.textContent.match(/camera/i); })
+        .filter((n) => { return n.textContent.match(/video/i); })
         .map((n) => { return n.textContent; })
         .join('');
     let cameraState =
-        (cameraText === "Turn On Camera") ? "OFF" :
-        (cameraText === "Turn Off Camera") ? "ON" :
+        (cameraText === "Turn on video") ? "OFF" :
+        (cameraText === "Turn off video") ? "ON" :
         "UNKNOWN";
 
-    return [micState, cameraState].join(" ");
+    let handText = Array.from(document.querySelectorAll('button'))
+        .filter((n) => { return n.textContent.match(/hand/i); })
+        .map((n) => { return n.textContent; })
+        .join('');
+    let handState =
+        (handText === "Raise hand") ? "OFF" :
+        (handText === "Lower hand") ? "ON" :
+        "UNKNOWN";
+
+    return [micState, cameraState, handState].join(" ");
 }

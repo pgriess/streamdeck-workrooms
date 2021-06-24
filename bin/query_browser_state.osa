@@ -33,5 +33,5 @@ on run argv
     #      pretty fragile. Maybe we should be smarter in parsing the output of
     #      this script in stead. If we return 1 element, for example, elements 2
     #      and above don't update.
-    return "UNKNOWN UNKNOWN"
+    return "UNKNOWN UNKNOWN UNKNOWN"
 end run

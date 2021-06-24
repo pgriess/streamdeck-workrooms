@@ -1,7 +1,8 @@
 (target) => {
     let re =
-        (target === "mic") ? /mute/i :
-        (target === "camera") ? /camera/i :
+        (target === "mic") ? /microphone/i :
+        (target === "camera") ? /video/i :
+        (target === "hand") ? /hand/i :
         null;
 
     if (re === null) {

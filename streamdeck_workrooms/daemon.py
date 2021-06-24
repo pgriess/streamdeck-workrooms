@@ -21,6 +21,11 @@ action_metadata = {
         'context': None,
         'state': None,
     },
+    'hand': {
+        'index': 2,
+        'context': None,
+        'state': None,
+    },
 }
 
 # Task to poll for Workrooms state
@@ -136,14 +141,17 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
     on_images = [
         load_image_string('state_mic_on.png'),
         load_image_string('state_camera_on.png'),
+        load_image_string('state_hand_on.png'),
     ]
     off_images = [
         load_image_string('state_mic_off.png'),
         load_image_string('state_camera_off.png'),
+        load_image_string('state_hand_off.png'),
     ]
     unknown_images = [
         load_image_string('state_mic_unknown.png'),
         load_image_string('state_camera_unknown.png'),
+        load_image_string('state_hand_unknown.png'),
     ]
 
     async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws:

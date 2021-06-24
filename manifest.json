@@ -23,6 +23,18 @@
       "SupportedInMultiActions": false,
       "Tooltip": "Toggle the camera",
       "UUID": "in.std.streamdeck.workrooms.camera"
+    },
+    {
+      "Icon": "action_hand",
+      "Name": "Hand",
+      "States": [
+        {
+          "Image": "state_hand_unknown"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "Toggle the hand",
+      "UUID": "in.std.streamdeck.workrooms.hand"
     }
   ],
   "SDKVersion": 2,
