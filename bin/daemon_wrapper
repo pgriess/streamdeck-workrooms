@@ -15,7 +15,7 @@ exec 2>>"$HOME"/Library/Logs/streamdeck-workrooms.log
 
 # Stream Deck seems to want to prevent executables other than what's explicitly
 # listed in CodePath. Fix up permissions.
-for fn in daemon query_mute_state.osa toggle_mute_state.osa ; do
+for fn in daemon query_browser_state.osa toggle_browser_state.osa ; do
     chmod +x "$ROOT_DIR/$fn"
 done
 

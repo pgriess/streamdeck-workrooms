@@ -20,7 +20,9 @@ async def state_poll(ws, context, muted_image, active_image, unknown_image):
     while True:
         await asyncio.sleep(1)
 
-        out = subprocess.check_output(os.path.join(os.path.curdir, 'query_mute_state.osa'), encoding='utf-8').strip()
+        out = subprocess.check_output(
+            [os.path.join(os.path.curdir, 'query_browser_state.osa'), 'mic'],
+            encoding='utf-8').strip()
 
         if out == current_state:
             continue
@@ -29,9 +31,9 @@ async def state_poll(ws, context, muted_image, active_image, unknown_image):
         current_state = out
 
         msg = {'event': 'setImage', 'context': context, 'payload': {}}
-        if current_state == 'MUTED':
+        if current_state == 'OFF':
             msg['payload']['image'] = muted_image
-        elif current_state == 'ACTIVE':
+        elif current_state == 'ON':
             msg['payload']['image'] = active_image
         else:
             msg['payload']['image'] = unknown_image
@@ -46,7 +48,9 @@ async def sd_listen(ws):
 
         if msg.get('event') == 'keyUp':
             info('toggling mute state')
-            subprocess.check_call(os.path.join(os.path.curdir, 'toggle_mute_state.osa'), encoding='utf-8')
+            subprocess.check_call(
+                [os.path.join(os.path.curdir, 'toggle_browser_state.osa'), 'mic'],
+                encoding='utf-8')
 
 
 def load_image_string(asset_name):
