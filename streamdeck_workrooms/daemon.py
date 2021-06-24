@@ -2,7 +2,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
 import base64
 import json
-from logging import WARNING, basicConfig, info
+from logging import ERROR, basicConfig, info
 import mimetypes
 import os
 import os.path
@@ -129,7 +129,7 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
     args = ap.parse_args()
 
     basicConfig(
-        style='{', format='{asctime} {message}', level=WARNING - args.v * 10,
+        style='{', format='{asctime} {message}', level=ERROR - args.v * 10,
         stream=sys.stderr)
 
     # Load images that we need
