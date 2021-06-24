@@ -46,7 +46,7 @@
   "Name": "Workplace Rooms",
   "Icon": "store",
   "URL": "https://github.com/pgriess/streamdeck-workrooms",
-  "Version": "0.1",
+  "Version": "0.2",
   "OS": [
     {
         "Platform": "mac",
