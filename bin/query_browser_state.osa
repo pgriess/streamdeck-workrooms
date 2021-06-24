@@ -28,5 +28,10 @@ on run argv
     end tell
 
     # No rooms
-    return "UNKNOWN"
+    #
+    # XXX: We return the same number of elements as the JavaScript does. This is
+    #      pretty fragile. Maybe we should be smarter in parsing the output of
+    #      this script in stead. If we return 1 element, for example, elements 2
+    #      and above don't update.
+    return "UNKNOWN UNKNOWN"
 end run
