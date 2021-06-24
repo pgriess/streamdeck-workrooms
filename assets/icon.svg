@@ -27,12 +27,12 @@
      inkscape:pagecheckerboard="0"
      showgrid="false"
      inkscape:zoom="17.020833"
-     inkscape:cx="12.425949"
+     inkscape:cx="9.1652389"
      inkscape:cy="24.705019"
      inkscape:window-width="1296"
      inkscape:window-height="997"
-     inkscape:window-x="86"
-     inkscape:window-y="25"
+     inkscape:window-x="1087"
+     inkscape:window-y="598"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg1332" />
   <path
@@ -45,5 +45,8 @@
      style="fill:#c8c8c8;fill-opacity:1"
      inkscape:export-filename="/Users/pgriess/src/pgriess-streamdeck-workrooms/assets/category.png"
      inkscape:export-xdpi="67.199997"
-     inkscape:export-ydpi="67.199997" />
+     inkscape:export-ydpi="67.199997">
+    <desc
+       id="desc1143">Derived from https://developers.google.com/fonts/, where icons are licensed under the Apache License 2.0. There is no LICENSE file listing Google or whoever the license-holder is; they just link to the generic ALv2 URL.</desc>
+  </path>
 </svg>

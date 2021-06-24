@@ -9,9 +9,9 @@
    id="svg997"
    sodipodi:docname="states.svg"
    inkscape:version="1.1 (c4e8f9e, 2021-05-24)"
-   inkscape:export-filename="/Users/pgriess/src/pgriess-streamdeck-workrooms/assets/state_camera_unknown@2x.png"
-   inkscape:export-xdpi="288"
-   inkscape:export-ydpi="288"
+   inkscape:export-filename="/Users/pgriess/src/pgriess-streamdeck-workrooms/assets/action_hand.png"
+   inkscape:export-xdpi="40"
+   inkscape:export-ydpi="40"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -28,14 +28,14 @@
      inkscape:pagecheckerboard="0"
      showgrid="false"
      inkscape:zoom="5.6568542"
-     inkscape:cx="2.032932"
+     inkscape:cx="-7.7781747"
      inkscape:cy="24.837126"
      inkscape:window-width="1586"
      inkscape:window-height="997"
      inkscape:window-x="988"
-     inkscape:window-y="581"
+     inkscape:window-y="553"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer9" />
+     inkscape:current-layer="layer6" />
   <g
      id="g985">
     <rect
@@ -58,7 +58,7 @@
      inkscape:groupmode="layer"
      id="layer1"
      inkscape:label="Background - Grey"
-     style="display:inline">
+     style="display:none">
     <circle
        style="fill:#646464;stroke-width:0.719963"
        id="path1677"
@@ -113,6 +113,8 @@
     <g
        id="g995"
        transform="translate(0,0.5)">
+      <desc
+         id="desc948">Derived from https://developers.google.com/fonts/, where icons are licensed under the Apache License 2.0. There is no LICENSE file listing Google or whoever the license-holder is; they just link to the generic ALv2 URL.</desc>
       <g
          id="g987" />
       <g
@@ -136,7 +138,10 @@
     <path
        d="m 10.957432,6.6161136 c 0,-0.5375741 0.439833,-0.9774075 0.977407,-0.9774075 0.537574,0 0.977408,0.4398334 0.977408,0.9774075 l -0.0081,3.1847195 1.474257,1.4579669 V 6.6975643 c 0,-1.3520804 -1.091439,-2.4435188 -2.443519,-2.4435188 -1.25434,0 -2.2724729,0.9448273 -2.410939,2.1584416 l 1.433531,1.433531 z m 6.678951,4.9684884 h -1.384661 c 0,0.472413 -0.08145,0.920391 -0.219916,1.33579 l 1.034422,1.034423 c 0.358383,-0.716766 0.570155,-1.523126 0.570155,-2.370213 z M 5.752737,4.9545209 4.6042833,6.1029747 9.4913208,10.990012 v 0.59459 c 0,1.35208 1.0914382,2.443519 2.4435182,2.443519 0.187337,0 0.358383,-0.02443 0.52943,-0.06516 l 1.35208,1.35208 c -0.5783,0.268787 -1.221759,0.423543 -1.88151,0.423543 -2.2480367,0 -4.3168826,-1.710462 -4.3168826,-4.153981 H 6.2332958 c 0,2.777466 2.215457,5.074374 4.8870372,5.473482 v 2.671581 h 1.629013 v -2.671581 c 0.7412,-0.105886 1.441676,-0.366528 2.07699,-0.733056 l 3.420927,3.420926 1.148454,-1.148453 z"
        id="path1062"
-       style="stroke-width:0.814506" />
+       style="stroke-width:0.814506">
+      <desc
+         id="desc946">Derived from https://developers.google.com/fonts/, where icons are licensed under the Apache License 2.0. There is no LICENSE file listing Google or whoever the license-holder is; they just link to the generic ALv2 URL.</desc>
+    </path>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -146,17 +151,23 @@
     <path
        d="M 8.6744442,6.592664 5.8693336,9.3977747 c -2.408161,2.4081603 -2.408161,6.3247313 0,8.7328923 2.408161,2.408161 6.3247304,2.408161 8.7328924,0 l 4.366445,-4.366447 c 0.688046,-0.688046 0.688046,-1.808326 0,-2.496372 -0.105854,-0.105853 -0.229349,-0.202885 -0.352844,-0.273454 l 0.502803,-0.502802 c 0.688046,-0.6880466 0.688046,-1.8083266 0,-2.4963727 C 18.986313,7.8629028 18.836355,7.7570496 18.677575,7.6776596 18.995135,7.0160769 18.88046,6.2045355 18.333552,5.6576272 17.733717,5.0577922 16.816322,4.9784023 16.128276,5.4194574 16.048883,5.2783197 15.951855,5.1460032 15.83718,5.0313289 c -0.688046,-0.6880461 -1.808327,-0.6880461 -2.496373,0 L 11.444271,6.9455081 C 11.373705,6.8220127 11.27667,6.6985172 11.170816,6.592664 c -0.688046,-0.6880459 -1.8083257,-0.6880459 -2.4963718,0 z m 0.935037,0.935037 c 0.176422,-0.1764221 0.4498758,-0.1764221 0.6262988,0 0.176421,0.176422 0.176421,0.4498762 0,0.6262982 L 7.7394074,10.641549 c 0.864468,0.864469 0.864468,2.258204 0,3.122671 l 0.9350368,0.935038 C 9.7241556,13.649546 9.9711464,12.114674 9.4330591,10.826794 L 14.293486,5.9663658 c 0.176423,-0.1764221 0.449877,-0.1764221 0.626299,0 0.176423,0.176422 0.176423,0.4498762 0,0.6262982 l -3.44023,3.431409 0.935037,0.935037 4.366446,-4.366446 c 0.176421,-0.176422 0.449877,-0.176422 0.626298,0 0.176422,0.1764221 0.176422,0.4498762 0,0.6262983 l -4.366446,4.3664467 0.935037,0.935036 3.590189,-3.5901887 c 0.176422,-0.1764221 0.449876,-0.1764221 0.626298,0 0.176422,0.176422 0.176422,0.4498762 0,0.6262982 l -4.216487,4.2076655 0.935037,0.935038 2.496372,-2.496372 c 0.176422,-0.176422 0.449877,-0.176422 0.626298,0 0.176423,0.176422 0.176423,0.449876 0,0.626298 l -4.366445,4.366446 c -1.896538,1.896536 -4.9662814,1.896536 -6.8628185,0 -1.8965371,-1.896537 -1.8965371,-4.966281 0,-6.862818 z M 4.0610076,8.4715589 c 0,-2.4346244 1.9759269,-4.4105513 4.4105513,-4.4105513 v 0.8821102 c -1.9494637,0 -3.5284411,1.5789774 -3.5284411,3.5284411 z M 19.938992,15.528441 c 0,2.434624 -1.975927,4.410551 -4.410551,4.410551 v -0.88211 c 1.949463,0 3.528441,-1.578977 3.528441,-3.528441 z"
        id="path826"
-       style="stroke-width:0.88211" />
+       style="stroke-width:0.88211">
+      <desc
+         id="desc944">Derived from https://developers.google.com/fonts/, where icons are licensed under the Apache License 2.0. There is no LICENSE file listing Google or whoever the license-holder is; they just link to the generic ALv2 URL.</desc>
+    </path>
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer9"
      inkscape:label="Icon - Camera On"
-     style="display:inline">
+     style="display:none">
     <path
        d="M 14.321343,8.9048762 V 15.095124 H 6.5835334 V 8.9048762 H 14.321343 M 15.095124,7.3573144 H 5.8097525 c -0.4255795,0 -0.7737809,0.3482015 -0.7737809,0.7737809 v 7.7378087 c 0,0.42558 0.3482014,0.773781 0.7737809,0.773781 h 9.2853715 c 0.425579,0 0.77378,-0.348201 0.77378,-0.773781 v -2.708232 l 3.095124,3.095124 V 7.7442048 L 15.868904,10.839329 V 8.1310953 c 0,-0.4255794 -0.348201,-0.7737809 -0.77378,-0.7737809 z"
        id="path980"
-       style="stroke-width:0.773781" />
+       style="stroke-width:0.773781">
+      <desc
+         id="desc940">Derived from https://developers.google.com/fonts/, where icons are licensed under the Apache License 2.0. There is no LICENSE file listing Google or whoever the license-holder is; they just link to the generic ALv2 URL.</desc>
+    </path>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -166,7 +177,10 @@
     <path
        d="M 10.4447,9.3459313 8.8971384,7.7983695 5.6859476,4.5949163 4.5949163,5.6859476 6.7073384,7.7983695 H 6.1424782 c -0.4255794,0 -0.7737809,0.3482015 -0.7737809,0.7737809 V 16.30996 c 0,0.425579 0.3482015,0.773781 0.7737809,0.773781 h 9.2853708 c 0.162495,0 0.301775,-0.0619 0.425581,-0.139281 l 2.460622,2.460624 1.091032,-1.091032 -6.8557,-6.855699 z M 6.9162592,15.536179 V 9.3459313 H 8.2549003 L 14.445148,15.536179 Z M 14.654068,9.3459313 v 2.0195677 l 4.642686,4.642686 V 8.1852599 L 16.201631,11.280384 V 8.5721504 c 0,-0.4255794 -0.348201,-0.7737809 -0.773782,-0.7737809 h -4.34091 L 12.6345,9.3459313 Z"
        id="path1130"
-       style="stroke-width:0.773781" />
+       style="stroke-width:0.773781">
+      <desc
+         id="desc942">Derived from https://developers.google.com/fonts/, where icons are licensed under the Apache License 2.0. There is no LICENSE file listing Google or whoever the license-holder is; they just link to the generic ALv2 URL.</desc>
+    </path>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -182,7 +196,10 @@
     <path
        style="color:#000000;fill:#000000;stroke-width:0.5;-inkscape-stroke:none"
        d="m 17.5,21 h 1 v -1 h -1 z M 18,13 c -2.76,0 -5,2.24 -5,5 0,2.76 2.24,5 5,5 2.76,0 5,-2.24 5,-5 0,-2.76 -2.24,-5 -5,-5 z m 0,9 c -2.205,0 -4,-1.795 -4,-4 0,-2.205 1.795,-4 4,-4 2.205,0 4,1.795 4,4 0,2.205 -1.795,4 -4,4 z m 0,-7 c -1.105,0 -2,0.895 -2,2 h 1 c 0,-0.55 0.45,-1 1,-1 0.55,0 1,0.45 1,1 0,1 -1.5,0.875 -1.5,2.5 h 1 c 0,-1.125 1.5,-1.25 1.5,-2.5 0,-1.105 -0.895,-2 -2,-2 z"
-       id="path914" />
+       id="path914">
+      <desc
+         id="desc993">Derived from https://developers.google.com/fonts/, where icons are licensed under the Apache License 2.0. There is no LICENSE file listing Google or whoever the license-holder is; they just link to the generic ALv2 URL.</desc>
+    </path>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -198,7 +215,10 @@
     <path
        d="m 17.5,19.44194 h 1 v 1 h -1 z m 0,-4 h 1 v 3 h -1 z m 0.495,-2.5 c -2.76,0 -4.995,2.24 -4.995,5 0,2.76 2.235,5 4.995,5 2.765,0 5.005,-2.24 5.005,-5 0,-2.76 -2.24,-5 -5.005,-5 z m 0.005,9 c -2.21,0 -4,-1.79 -4,-4 0,-2.21 1.79,-4 4,-4 2.21,0 4,1.79 4,4 0,2.21 -1.79,4 -4,4 z"
        id="path824"
-       style="stroke-width:0.5" />
+       style="stroke-width:0.5">
+      <desc
+         id="desc991">Derived from https://developers.google.com/fonts/, where icons are licensed under the Apache License 2.0. There is no LICENSE file listing Google or whoever the license-holder is; they just link to the generic ALv2 URL.</desc>
+    </path>
     <path
        style="fill:#dabe21;fill-opacity:1;stroke-width:0.176777"
        d="m 34.490606,43.649418 c -2.350401,-0.461591 -4.525361,-2.196897 -5.60628,-4.473004 -2.234295,-4.704791 0.689662,-10.171692 5.934419,-11.095538 3.257584,-0.573812 6.718798,1.272404 8.270122,4.411296 0.650892,1.316991 0.663365,1.380628 0.663365,3.384329 0,1.930911 -0.03081,2.107153 -0.565941,3.236851 -0.772758,1.631354 -2.100581,2.99447 -3.663505,3.760875 -1.82317,0.894022 -3.282446,1.118819 -5.03218,0.775191 z m 2.6325,-3.794708 v -1.157484 l -1.104854,0.05263 -1.104854,0.05263 -0.05477,0.861422 c -0.08139,1.280228 -0.02091,1.348287 1.198268,1.348287 h 1.066208 z m 0,-6.010408 v -3.102027 l -1.104854,0.05263 -1.104854,0.05263 -0.04887,2.821331 c -0.02688,1.551732 -0.0095,2.923961 0.03865,3.049398 0.05808,0.151355 0.446141,0.228067 1.153726,0.228067 h 1.066208 z"
