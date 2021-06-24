@@ -15,7 +15,10 @@ context_mic = None
 
 # Task to poll for Workrooms state
 async def state_poll(ws, off_image, on_image, unknown_image):
-    current_state = None
+    # These constants must match query.js
+    MIC_INDEX = 0
+
+    current_state = [None, None]
 
     while True:
         await asyncio.sleep(1)
@@ -27,22 +30,25 @@ async def state_poll(ws, off_image, on_image, unknown_image):
         out = subprocess.check_output(
             [os.path.join(os.path.curdir, 'query_browser_state.osa'), 'mic'],
             encoding='utf-8').strip()
+        next_state = out.split(' ')
 
-        if out == current_state:
+        if next_state == current_state:
             continue
 
-        info('current state changed from {} to {}'.format(current_state, out))
-        current_state = out
+        info('state changed from {} to {}'.format(current_state, next_state))
 
-        msg = {'event': 'setImage', 'context': context_mic, 'payload': {}}
-        if current_state == 'OFF':
-            msg['payload']['image'] = off_image
-        elif current_state == 'ON':
-            msg['payload']['image'] = on_image
-        else:
-            msg['payload']['image'] = unknown_image
+        if current_state[MIC_INDEX] != next_state[MIC_INDEX]:
+            msg = {'event': 'setImage', 'context': context_mic, 'payload': {}}
+            if next_state[MIC_INDEX] == 'OFF':
+                msg['payload']['image'] = off_image
+            elif next_state[MIC_INDEX] == 'ON':
+                msg['payload']['image'] = on_image
+            else:
+                msg['payload']['image'] = unknown_image
 
-        await ws.send(json.dumps(msg))
+            await ws.send(json.dumps(msg))
+
+        current_state = next_state
 
 
 # Task to listen to Stream Deck commands

@@ -14,15 +14,13 @@ on run argv
     set binDir to do shell script "dirname " & (quoted form of ((POSIX path of (path to me)) as string))
     set queryText to (read file (POSIX file (binDir & "/query.js"))) as string
 
-    set target to (item 1 of argv)
-
     tell application "Google Chrome"
         repeat with w in windows
             repeat with t in tabs of w
                 # TODO: Handle multiple tabs with calls. Only one should be active.
                 if title of t is "Workplace Room" then
                     tell t
-                        return execute javascript ("(" & queryText & ")('" & target & "');")
+                        return execute javascript ("(" & queryText & ")();")
                     end tell
                 end if
             end repeat
