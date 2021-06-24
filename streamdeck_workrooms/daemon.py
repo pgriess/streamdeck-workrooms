@@ -153,13 +153,21 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         msg = json.dumps({'event': args.registerEvent, 'uuid': args.pluginUUID})
         await ws.send(msg)
 
-        # Listen for events from Stream Deck
-        await asyncio.wait(
+        # Start up the event loop, one coroutine for each source
+        done_tasks, pending_tasks = await asyncio.wait(
             [
                 sd_listen(ws),
                 state_poll(ws, on_images, off_images, unknown_images),
             ],
             return_when=asyncio.FIRST_EXCEPTION)
+
+        # If one of the tasks exited due to an exception, just re-raise it to
+        # terminate everything and get the stack trace written to stderr
+        for dt in done_tasks:
+            if dt.exception() is not None:
+                raise dt.exception()
+
+        info('event loop exited')
 
 if __name__ == '__main__':
     asyncio.run(main())
