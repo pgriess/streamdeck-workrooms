@@ -13,7 +13,7 @@ SOURCES=$(shell find $(ROOT_DIR)/streamdeck_workrooms -name '*.py')
 
 .PHONY: clean install
 
-$(PLUGIN_FILE): $(DIST_DIR)/daemon $(ASSETS) $(BINARIES) $(ROOT_DIR)/manifest.json $(ROOT_DIR)/en.json
+$(PLUGIN_FILE): $(DIST_DIR)/daemon $(ASSETS) $(BINARIES) $(ROOT_DIR)/manifest.json
 	mkdir -p $(PLUGIN_DIR)
 	cp -f $^ $(PLUGIN_DIR)
 	rm -f $@

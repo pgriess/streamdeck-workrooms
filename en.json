@@ -1,8 +1,0 @@
-{
-  "Description": "Bindings for Facebook tools.",
-  "Name": "FB",
-  "in.std.fb.microphone": {
-    "Name": "Microphone",
-    "Tooltip": "This action toggles the microphone."
-  }
-}
