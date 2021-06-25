@@ -31,6 +31,10 @@ action_metadata = {
 
 # Task to poll for Workrooms state
 async def state_poll(ws, on_images, off_images, unknown_images, none_images):
+    MIC_INDEX = action_metadata['mic']['index']
+    CAMERA_INDEX = action_metadata['camera']['index']
+    HAND_INDEX = action_metadata['hand']['index']
+
     while True:
         await asyncio.sleep(1)
 
@@ -44,6 +48,15 @@ async def state_poll(ws, on_images, off_images, unknown_images, none_images):
             out = 'NONE NONE NONE'
 
         next_states_array = out.split(' ')
+
+        # Some calls don't have a hand state, which will cause it to come back
+        # from the query as UNKNOWN. In this case, don't show the user the
+        # confusing "unknown" icon. Just consider it "none" since this is
+        # expected.
+        if next_states_array[HAND_INDEX] == 'UNKNOWN' and \
+                next_states_array[MIC_INDEX] in ['ON', 'OFF'] and \
+                next_states_array[CAMERA_INDEX] in ['ON', 'OFF']:
+            next_states_array[HAND_INDEX] = 'NONE'
 
         for name, data in action_metadata.items():
             index = data['index']
