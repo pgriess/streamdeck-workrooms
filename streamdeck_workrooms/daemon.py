@@ -102,7 +102,25 @@ async def sd_listen(ws):
                 action_metadata[action]['context'] = None
                 action_metadata[action]['state'] = None
 
+            continue
+
         if event == 'keyUp':
+            # We have no idea what the current state is; do nothing
+            if action_metadata[action]['state'] == None:
+                continue
+
+            if action_metadata[action]['state'] in ['NONE', 'UNKNOWN']:
+                info('opening up the help page')
+                await ws.send(json.dumps({
+                    'event': 'openUrl',
+                    'context': context,
+                    'payload': {
+                        'url': 'https://github.com/pgriess/streamdeck-workrooms/wiki/Help'
+                    }
+                }))
+
+                continue
+
             info('toggling {} state'.format(action))
             try:
                 subprocess.check_call(
