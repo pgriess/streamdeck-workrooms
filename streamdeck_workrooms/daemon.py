@@ -38,25 +38,34 @@ async def state_poll(ws, on_images, off_images, unknown_images, none_images):
     while True:
         await asyncio.sleep(1)
 
-        out = None
+        next_states_array = [None] * len(action_metadata)
+
         try:
             out = subprocess.check_output(
                 [os.path.join(os.path.curdir, 'query_browser_state.osa'), 'mic'],
                 encoding='utf-8').strip()
+
+            # This sentinel value means no rooms were found
+            if out == 'NONE':
+                next_states_array = ['NONE'] * len(action_metadata)
+            else:
+                next_states_array = out.split(' ')
+                assert len(next_states_array) == len(action_metadata)
+
+                # Some calls don't have a hand state, which will cause it to
+                # come back from the query as UNKNOWN. In this case, don't show
+                # the user the confusing UNKNOWN icon. Just consider it NONE
+                # since this is expected.
+                if next_states_array[HAND_INDEX] == 'UNKNOWN' and \
+                        next_states_array[MIC_INDEX] in ['ON', 'OFF'] and \
+                        next_states_array[CAMERA_INDEX] in ['ON', 'OFF']:
+                    next_states_array[HAND_INDEX] = 'NONE'
+
         except subprocess.CalledProcessError:
             error(traceback.format_exc())
-            out = 'NONE NONE NONE'
+            next_states_array = ['NONE'] * len(action_metadata)
 
-        next_states_array = out.split(' ')
-
-        # Some calls don't have a hand state, which will cause it to come back
-        # from the query as UNKNOWN. In this case, don't show the user the
-        # confusing "unknown" icon. Just consider it "none" since this is
-        # expected.
-        if next_states_array[HAND_INDEX] == 'UNKNOWN' and \
-                next_states_array[MIC_INDEX] in ['ON', 'OFF'] and \
-                next_states_array[CAMERA_INDEX] in ['ON', 'OFF']:
-            next_states_array[HAND_INDEX] = 'NONE'
+        assert len(next_states_array) == len(action_metadata)
 
         for name, data in action_metadata.items():
             index = data['index']
