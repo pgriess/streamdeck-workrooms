@@ -1,4 +1,4 @@
-# 0.3
+# 1.0
 - Expose error codes through action titles; use openUrl action to open relevant
   wiki page when invoking action
 - Re-theme icons to better match Workplace Rooms
