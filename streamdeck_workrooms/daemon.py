@@ -40,7 +40,7 @@ action_metadata = {
 }
 
 
-# Task to poll for Workrooms state
+# Task to poll for state
 async def state_poll(ws, on_images, off_images, unknown_images, none_images):
     MIC_INDEX = action_metadata['mic']['index']
     CAMERA_INDEX = action_metadata['camera']['index']

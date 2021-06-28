@@ -1,4 +1,4 @@
-PLUGIN_ID=in.std.streamdeck.workrooms
+PLUGIN_ID=in.std.streamdeck.workplace
 
 ROOT_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BUILD_DIR=$(ROOT_DIR)/build

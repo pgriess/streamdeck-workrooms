@@ -10,7 +10,7 @@
       ],
       "SupportedInMultiActions": false,
       "Tooltip": "Toggle the microphone",
-      "UUID": "in.std.streamdeck.workrooms.mic"
+      "UUID": "in.std.streamdeck.workplace.mic"
     },
     {
       "Icon": "action_camera",
@@ -22,7 +22,7 @@
       ],
       "SupportedInMultiActions": false,
       "Tooltip": "Toggle the camera",
-      "UUID": "in.std.streamdeck.workrooms.camera"
+      "UUID": "in.std.streamdeck.workplace.camera"
     },
     {
       "Icon": "action_hand",
@@ -34,16 +34,16 @@
       ],
       "SupportedInMultiActions": false,
       "Tooltip": "Toggle the hand",
-      "UUID": "in.std.streamdeck.workrooms.hand"
+      "UUID": "in.std.streamdeck.workplace.hand"
     }
   ],
   "SDKVersion": 2,
   "Author": "Peter Griess",
   "CodePathMac": "daemon_wrapper",
-  "Description": "Actions for Facebook Workplace Rooms",
-  "Category": "Workplace Rooms",
+  "Description": "Control the microphone, camera, and more on Facebook Workplace calls.",
+  "Category": "Facebook Workplace",
   "CategoryIcon": "category",
-  "Name": "Workplace Rooms",
+  "Name": "Facebook Workplace",
   "Icon": "store",
   "URL": "https://github.com/pgriess/streamdeck-workrooms/wiki",
   "Version": "1.1",
