@@ -11,23 +11,34 @@ import sys
 import traceback
 import websockets
 
+
+# User-facing error codes
+EC_QUERY_SUBPROCESS_FAILED = 'E1'
+EC_QUERY_DOM_FAILED = 'E2'
+
+
+# Global state for each action
 action_metadata = {
     'mic': {
         'index': 0,
         'context': None,
         'state': None,
+        'error': None,
     },
     'camera': {
         'index': 1,
         'context': None,
         'state': None,
+        'error': None,
     },
     'hand': {
         'index': 2,
         'context': None,
         'state': None,
+        'error': None,
     },
 }
+
 
 # Task to poll for Workrooms state
 async def state_poll(ws, on_images, off_images, unknown_images, none_images):
@@ -39,63 +50,93 @@ async def state_poll(ws, on_images, off_images, unknown_images, none_images):
         await asyncio.sleep(1)
 
         next_states_array = [None] * len(action_metadata)
+        next_errors_array = [None] * len(action_metadata)
 
+        # Fill in the next_*_array values by querying browser state.
         try:
             out = subprocess.check_output(
                 [os.path.join(os.path.curdir, 'query_browser_state.osa'), 'mic'],
                 encoding='utf-8').strip()
 
-            # This sentinel value means no rooms were found
+            # The 'NONE' sentinel value means no rooms were found. Expand that
+            # to fill each of the actions rather than doing that in query.js
             if out == 'NONE':
                 next_states_array = ['NONE'] * len(action_metadata)
             else:
                 next_states_array = out.split(' ')
-                assert len(next_states_array) == len(action_metadata)
 
-                # Some calls don't have a hand state, which will cause it to
-                # come back from the query as UNKNOWN. In this case, don't show
-                # the user the confusing UNKNOWN icon. Just consider it NONE
-                # since this is expected.
-                if next_states_array[HAND_INDEX] == 'UNKNOWN' and \
-                        next_states_array[MIC_INDEX] in ['ON', 'OFF'] and \
-                        next_states_array[CAMERA_INDEX] in ['ON', 'OFF']:
-                    next_states_array[HAND_INDEX] = 'NONE'
+            assert len(next_states_array) == len(action_metadata)
+
+            # Some calls don't have a hand state, which will cause it to
+            # come back from the query as UNKNOWN. In this case, don't show
+            # the user the confusing UNKNOWN icon. Just consider it NONE
+            # since this is expected.
+            if next_states_array[HAND_INDEX] == 'UNKNOWN' and \
+                    next_states_array[MIC_INDEX] in ['ON', 'OFF'] and \
+                    next_states_array[CAMERA_INDEX] in ['ON', 'OFF']:
+                next_states_array[HAND_INDEX] = 'NONE'
+
+            # Any entries in the next_states_array that are UNKNOWN mean
+            # that we couldn't find the DOM node. Mark this as an error in
+            # the relevant field.
+            #
+            # XXX: This isn't really true as we could have found the node but
+            #      not been able to interpret its contents. Update query.js to
+            #      differentiate the different failure modes.
+            for index, state in enumerate(next_states_array):
+                if state != 'UNKNOWN':
+                    continue
+
+                next_errors_array[index] = EC_QUERY_DOM_FAILED
 
         except subprocess.CalledProcessError:
             error(traceback.format_exc())
-            next_states_array = ['NONE'] * len(action_metadata)
+            next_states_array = ['UNKNOWN'] * len(action_metadata)
+            next_errors_array = [EC_QUERY_SUBPROCESS_FAILED] * len(action_metadata)
 
         assert len(next_states_array) == len(action_metadata)
+        assert len(next_errors_array) == len(action_metadata)
 
+        # Loop over all actions and update the Stream Deck accordingly
         for name, data in action_metadata.items():
             index = data['index']
             context = data['context']
             current_state = data['state']
+            current_error = data['error']
             next_state = next_states_array[index]
-
-            # Nothing has changed; don't update
-            if current_state == next_state:
-                continue
+            next_error = next_errors_array[index]
 
             # We have no context; don't update
             if context is None:
                 continue
 
-            info('{} state changed from {} to {}'.format(name, current_state, next_state))
+            # Update the image to reflect a change in state
+            if current_state != next_state:
+                data['state'] = next_state
+                info('{} state changed from {} to {}'.format(name, current_state, next_state))
 
-            msg = {'event': 'setImage', 'context': context, 'payload': {}}
-            if next_state == 'OFF':
-                msg['payload']['image'] = off_images[index]
-            elif next_state == 'ON':
-                msg['payload']['image'] = on_images[index]
-            elif next_state == 'NONE':
-                msg['payload']['image'] = none_images[index]
-            else:
-                msg['payload']['image'] = unknown_images[index]
+                msg = {'event': 'setImage', 'context': context, 'payload': {}}
+                if next_state == 'OFF':
+                    msg['payload']['image'] = off_images[index]
+                elif next_state == 'ON':
+                    msg['payload']['image'] = on_images[index]
+                elif next_state == 'NONE' or next_state == 'UNKNOWN':
+                    msg['payload']['image'] = none_images[index]
+                else:
+                    raise Exception('Unexpected state {}'.format(next_state))
 
-            await ws.send(json.dumps(msg))
+                await ws.send(json.dumps(msg))
 
-            data['state'] = next_state
+            # Update the title to reflect current error
+            if current_error != next_error:
+                data['error'] = next_error
+                info('{} error changed from {} to {}'.format(name, current_error, next_error))
+
+                await ws.send(
+                    json.dumps({
+                        'event': 'setTitle',
+                        'context': context,
+                        'payload': {'title': next_error}}))
 
 
 # Task to listen to Stream Deck commands
@@ -112,6 +153,7 @@ async def sd_listen(ws):
             continue
 
         action = msg['action'].split('.')[-1]
+        data = action_metadata[action]
 
         # XXX: This assumes that we only have one action of a given type
         #      active at once. I don't think that is actually the case.
@@ -128,10 +170,24 @@ async def sd_listen(ws):
 
         if event == 'keyUp':
             # We have no idea what the current state is; do nothing
-            if action_metadata[action]['state'] == None:
+            if data['state'] is None:
                 continue
 
-            if action_metadata[action]['state'] in ['NONE', 'UNKNOWN']:
+            # We have an error; direct the user to the help page for this error
+            if data['error'] != None:
+                info('opening up the help page for error {}'.format(data['error']))
+                await ws.send(json.dumps({
+                    'event': 'openUrl',
+                    'context': context,
+                    'payload': {
+                        'url': 'https://github.com/pgriess/streamdeck-workrooms/wiki/Errors#{}'.format(data['error'].lower())
+                    }
+                }))
+
+                continue
+
+            # We have an unexpected state; direct the user to the help page for this state
+            if data['state'] in ['NONE', 'UNKNOWN']:
                 info('opening up the help page')
                 await ws.send(json.dumps({
                     'event': 'openUrl',
