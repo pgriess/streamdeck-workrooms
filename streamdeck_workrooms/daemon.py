@@ -194,7 +194,7 @@ async def sd_listen(ws):
 
         # XXX: This assumes that we only have one action of a given type
         #      active at once. I don't think that is actually the case.
-        if event == 'willAppear' or event == 'willDissappear':
+        if event == 'willAppear' or event == 'willDisappear':
             context = msg['context']
 
             if event == 'willAppear':
