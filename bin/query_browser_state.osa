@@ -1,7 +1,6 @@
 #!/usr/bin/env osascript
 #
-# Get browser state from any active calls. Returns MUTED, ACTIVE, or UNKNOWN by
-# writing to stdout.
+# Get browser state from any active calls, writing results to stdout.
 #
 # NOTES:
 #
