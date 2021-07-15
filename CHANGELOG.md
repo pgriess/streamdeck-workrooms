@@ -1,3 +1,9 @@
+# 1.0.1
+- Fix bug with action being stored in a folder that can cause the plugin state
+  to become unsynchronized from the Stream Deck
+- Add heuristic to detect end-of-call scenario and display NONE buttons rather
+  than "E2", indicating that the plugin couldn't understand the webpage
+
 # 1.0
 - Expose error codes through action titles; use openUrl action to open relevant
   wiki page when invoking action
