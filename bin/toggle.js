@@ -2,9 +2,9 @@
     // Regular expressions to idetify buttons. These must be kept in-sync
     // between toggle.js <=> query.js
     // ***** BEGIN *****
-    let micButtonRegex = /microphone/i;
-    let cameraButtonRegex = /video|camera/i;
-    let handButtonRegex = /hand/i;
+    let micButtonRegex = /^(mute|unmute) microphone$/i;
+    let cameraButtonRegex = /^turn (off|on) (video|camera)$/i;
+    let handButtonRegex = /^(raise|lower) hand$/i;
     // ***** END *****
 
     let re =
