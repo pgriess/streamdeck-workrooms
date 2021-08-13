@@ -11,6 +11,19 @@
     let handButtonRegex = /^(raise|lower) hand$/i;
     // ***** END *****
 
+    // There is a post-call survey with a bunch of buttons. Detect this and
+    // short-circuit the rest of our checks since there is no active call.
+    // Return the sentinel NONE value so that the daemon can handle this
+    // appropriately.
+    let ratingButtonRegex = /^very good$/i;
+    let svgText = Array.from(document.querySelectorAll("svg"))
+        .map((n) => { return n.getAttribute("aria-label") || ""; })
+        .filter((t) => { return t.match(ratingButtonRegex); })
+        .join("");
+    if (svgText !== "") {
+        return "NONE";
+    }
+
     let micOffRegex = /^unmute microphone$/i;
     let micOnRegex = /^mute microphone$/i;
     let micText = Array.from(document.querySelectorAll('button'))
@@ -43,23 +56,6 @@
         (handText.match(handOffRegex)) ? "OFF" :
         (handText.match(handOnRegex)) ? "ON" :
         "UNKNOWN";
-
-    // Heuristic to detect pages which match the call URL, but don't have any
-    // call buttons. Rather than returning UNKNOWN for these (which would
-    // result in an error show to the user), return our sentinel NONE value so
-    // that the daemon handles this appropriately.
-    //
-    // N.B. The array length check is based on the pre-call UI having 7 buttons
-    //      and the in-call UI having 10. Anything less than 7 is "probably"
-    //      the post-call UI.
-    //
-    // Fixes #22
-    if (micState === "UNKNOWN" &&
-            cameraState === "UNKNOWN" &&
-            handState === "UNKNOWN" &&
-            Array.from(document.querySelectorAll('button')).length < 7) {
-        return "NONE";
-    }
 
     return [micState, cameraState, handState].join(" ");
 }
