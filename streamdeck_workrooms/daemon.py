@@ -21,6 +21,7 @@ ERROR_GRACE_PERIOD_SECONDS = 5
 # User-facing error codes
 EC_QUERY_SUBPROCESS_FAILED = 'E1'
 EC_QUERY_DOM_FAILED = 'E2'
+EC_CHROME_APPLESCRIPT_DISABLED = 'E3'
 
 
 # State of an action
@@ -67,43 +68,65 @@ async def state_poll(ws, on_images, off_images, unknown_images, none_images):
         errors_array = [None] * len(action_metadata)
 
         # Fill in the *_array values by querying browser
+        #
+        # Error handling here is quite involved, as there are many different
+        # layers in which things could fail. Some of these errors mean that we
+        # can't interpret any results (e.g. failed to execute the query script),
+        # while some are partial (e.g. we can't find the "hand" button).
         try:
-            out = subprocess.check_output(
-                [os.path.join(os.path.curdir, 'query_browser_state.osa'), 'mic'],
-                encoding='utf-8').strip()
+            proc = await asyncio.create_subprocess_exec(
+                os.path.join(os.path.curdir, 'query_browser_state.osa'),
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE)
 
-            # The 'NONE' sentinel value means no rooms were found. Expand that
-            # to fill each of the actions rather than doing that in query.js
-            if out == 'NONE':
-                status_array = ['NONE'] * len(action_metadata)
+            out, err = await proc.communicate()
+            out = out.decode('utf-8').strip()
+            err = err.decode('utf-8').strip()
+
+            if proc.returncode == 0:
+                # The 'NONE' sentinel value means no rooms were found. Expand that
+                # to fill each of the actions rather than doing that in query.js
+                if out == 'NONE':
+                    status_array = ['NONE'] * len(action_metadata)
+                else:
+                    status_array = out.split(' ')
+
+                assert len(status_array) == len(action_metadata)
+
+                # Some calls don't have a hand status, which will cause it to
+                # come back from the query as UNKNOWN. In this case, don't show
+                # the user the confusing UNKNOWN icon. Just consider it NONE
+                # since this is expected.
+                if status_array[HAND_INDEX] == 'UNKNOWN' and \
+                        status_array[MIC_INDEX] in ['ON', 'OFF'] and \
+                        status_array[CAMERA_INDEX] in ['ON', 'OFF']:
+                    status_array[HAND_INDEX] = 'NONE'
+
+                # Any entries in the status_array that are UNKNOWN mean
+                # that we couldn't find the DOM node. Mark this as an error in
+                # the relevant field.
+                #
+                # XXX: This isn't really true as we could have found the node but
+                #      not been able to interpret its contents. Update query.js to
+                #      differentiate the different failure modes.
+                for index, status in enumerate(status_array):
+                    if status != 'UNKNOWN':
+                        continue
+
+                    errors_array[index] = EC_QUERY_DOM_FAILED
             else:
-                status_array = out.split(' ')
+                error('query failed with status {}\nstdout={}\nstderr={}'.format(proc.returncode, out, err))
 
-            assert len(status_array) == len(action_metadata)
+                # Compute the error code, defaulting to the generic
+                # EC_QUERY_SUBPROCESS_FAILED
+                ec = EC_QUERY_SUBPROCESS_FAILED
+                if 'Executing JavaScript through AppleScript is turned off' in err:
+                    ec = EC_CHROME_APPLESCRIPT_DISABLED
 
-            # Some calls don't have a hand status, which will cause it to
-            # come back from the query as UNKNOWN. In this case, don't show
-            # the user the confusing UNKNOWN icon. Just consider it NONE
-            # since this is expected.
-            if status_array[HAND_INDEX] == 'UNKNOWN' and \
-                    status_array[MIC_INDEX] in ['ON', 'OFF'] and \
-                    status_array[CAMERA_INDEX] in ['ON', 'OFF']:
-                status_array[HAND_INDEX] = 'NONE'
+                status_array = ['UNKNOWN'] * len(action_metadata)
+                errors_array = [ec] * len(action_metadata)
 
-            # Any entries in the status_array that are UNKNOWN mean
-            # that we couldn't find the DOM node. Mark this as an error in
-            # the relevant field.
-            #
-            # XXX: This isn't really true as we could have found the node but
-            #      not been able to interpret its contents. Update query.js to
-            #      differentiate the different failure modes.
-            for index, status in enumerate(status_array):
-                if status != 'UNKNOWN':
-                    continue
-
-                errors_array[index] = EC_QUERY_DOM_FAILED
-
-        except subprocess.CalledProcessError:
+        except Exception:
             error(traceback.format_exc())
             status_array = ['UNKNOWN'] * len(action_metadata)
             errors_array = [EC_QUERY_SUBPROCESS_FAILED] * len(action_metadata)
@@ -242,10 +265,23 @@ async def sd_listen(ws):
 
             info('toggling {} status'.format(action))
             try:
-                subprocess.check_call(
-                    [os.path.join(os.path.curdir, 'toggle_browser_state.osa'), action],
-                    encoding='utf-8')
-            except subprocess.CalledProcessError:
+                proc = await asyncio.create_subprocess_exec(
+                    os.path.join(os.path.curdir, 'toggle_browser_state.osa'),
+                    action,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE)
+
+                out, err = await proc.communicate()
+                out = out.decode('utf-8').strip()
+                err = err.decode('utf-8').strip()
+
+                if proc.returncode != 0:
+                    error('toggle failed with status {}\nstdout={}\nstderr={}'.format(
+                        proc.returncode,
+                        out,
+                        err))
+
+            except Exception:
                 error(traceback.format_exc())
 
 
