@@ -1,3 +1,9 @@
+# 1.0.2
+- Don't start Chrome if it's not already running
+- Fix bug where a user screen sharing could confuse the query system
+- Detect the post-call survey (star rating) which used to cause an E2 and now
+  shows all actions as disabled since there is no active call
+
 # 1.0.1
 - Fix bug with action being stored in a folder that can cause the plugin state
   to become unsynchronized from the Stream Deck
