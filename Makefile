@@ -11,7 +11,7 @@ ASSETS=$(wildcard $(ROOT_DIR)/assets/*.png)
 BINARIES=$(wildcard $(ROOT_DIR)/bin/*)
 SOURCES=$(shell find $(ROOT_DIR)/streamdeck_workrooms -name '*.py')
 
-.PHONY: clean install
+.PHONY: clean install plugin
 
 $(PLUGIN_FILE): $(DIST_DIR)/daemon $(ASSETS) $(BINARIES) $(ROOT_DIR)/manifest.json
 	mkdir -p $(PLUGIN_DIR)
@@ -36,3 +36,6 @@ install: $(PLUGIN_FILE)
 
 clean:
 	rm -fr $(BUILD_DIR) $(DIST_DIR)
+
+plugin: $(PLUGIN_FILE)
+	echo -e '***** NEW PLUGIN BUILT *****\n$(PLUGIN_FILE)'
