@@ -12,16 +12,29 @@
     let callButtonRegex = /^(join as )|(end call)/i;
     // ***** END *****
 
-    // There is a post-call survey with a bunch of buttons. Detect this and
-    // short-circuit the rest of our checks since there is no active call.
+    // Detect post-call screens and short-circuit the rest of the checks.
     // Return the sentinel NONE value so that the daemon can handle this
     // appropriately.
+    //
+    // There are two variants of this
+    //
+    //  1. A post-call survey with a bunch of buttons.
+    //
+    //  2. A splash page indicates that the call is no longer active.
     let ratingButtonRegex = /^very good$/i;
     let svgText = Array.from(document.querySelectorAll("svg"))
         .map((n) => { return n.getAttribute("aria-label") || ""; })
         .filter((t) => { return t.match(ratingButtonRegex); })
         .join("");
     if (svgText !== "") {
+        return "NONE";
+    }
+
+    let leftButtonRegex = /^you left the room$/i;
+    let leftText = Array.from(document.querySelectorAll("div"))
+        .filter((n) => { return n.textContent.match(leftButtonRegex); })
+        .join("");
+    if (leftText !== "") {
         return "NONE";
     }
 
