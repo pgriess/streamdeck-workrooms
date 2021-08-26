@@ -1,16 +1,22 @@
-from argparse import Action, ArgumentParser, RawDescriptionHelpFormatter
+from aiohttp import ClientSession
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
 import base64
 import json
 from logging import ERROR, basicConfig, error, info
+import math
 import mimetypes
 from collections import namedtuple
 import os
 import os.path
+from functools import partial
+from random import Random, randint
 import subprocess
 import sys
 import time
 import traceback
+from urllib.parse import urlencode
+from uuid import UUID
 import websockets
 
 
@@ -62,7 +68,7 @@ action_metadata = {
 
 
 # Task to poll for state
-async def state_poll(ws, on_images, off_images, unknown_images, none_images):
+async def state_poll(ws, analytics, on_images, off_images, unknown_images, none_images):
     MIC_INDEX = action_metadata['mic']['index']
     CAMERA_INDEX = action_metadata['camera']['index']
     HAND_INDEX = action_metadata['hand']['index']
@@ -140,6 +146,14 @@ async def state_poll(ws, on_images, off_images, unknown_images, none_images):
             status_array = ['UNKNOWN'] * len(action_metadata)
             errors_array = [EC_QUERY_SUBPROCESS_FAILED] * len(action_metadata)
 
+        # Report query timing, sampled at 1%
+        if randint(0, 100) == 0:
+            await analytics(
+                t='timing',
+                utc='query',
+                utv='subprocess',
+                utt=int((time.time() - now) * 1000))
+
         assert len(status_array) == len(action_metadata)
         assert len(errors_array) == len(action_metadata)
 
@@ -205,7 +219,7 @@ async def state_poll(ws, on_images, off_images, unknown_images, none_images):
 
 
 # Task to listen to Stream Deck commands
-async def sd_listen(ws):
+async def sd_listen(ws, analytics):
     global context_mic
 
     while True:
@@ -291,6 +305,82 @@ async def sd_listen(ws):
             except Exception:
                 error(traceback.format_exc())
 
+            await analytics(t='event', ec='Actions', ea=action.title())
+
+
+# Send analytics
+#
+# TODO: Run this in a separate coroutine and send it work by enqueueing. We
+#       don't want this work to block the work functions, even if it doesn't
+#       block the event loop because it's all async.
+#
+#       If we do that, maybe use the 'qt' paramter to track queue time.
+async def analytics_send(client_session, tid, cid, t, **kwargs):
+    params = {
+        'v': 1,
+        'tid': tid,
+        'cid': cid,
+        't': t,
+    }
+    params.update(kwargs)
+    data = urlencode(params).encode('utf-8')
+    url = 'https://www.google-analytics.com/collect'
+
+    info(f'sending analytics {params}')
+
+    try:
+        await client_session.post(url, data=data)
+    except Exception:
+        error(traceback.format_exc())
+
+
+# Get the plugin version string from manifest.json
+def get_plugin_version():
+    with open('manifest.json', encoding='utf-8') as f:
+        jo = json.load(f)
+        return jo['Version']
+
+
+# Get a stable client UUID based on the serial number of the connected Stream
+# Deck device
+def get_client_uuid():
+    out = subprocess.check_output(
+        ('system_profiler', 'SPUSBDataType'),
+        stderr=subprocess.DEVNULL)
+
+    # TODO: Harden parsing here to handle the case where the device does not have a
+    #       serial number. I'm not sure this could happen, but if it does we'd want
+    #       to make sure that we fail rather than grab whatever the next serial
+    #       number happens to be (especially if the next one is 0 which is common).
+    found_device = False
+    for l in out.decode('utf-8').split('\n'):
+        l = l.strip()
+
+        if not found_device:
+            if 'Stream Deck' in l:
+                found_device = True
+
+            continue
+
+        if not l.startswith('Serial Number: '):
+            continue
+
+        serial = l.split(' ')[2]
+
+        seed = 0
+        for c in serial:
+            seed = seed * 256 + ord(c)
+
+        r = Random(seed)
+        b = []
+        for i in range(16):
+            b += [math.floor(r.random() * 256)]
+
+        u = UUID(bytes=bytes(b))
+        return str(u)
+
+    raise Exception('Failed to find serial number')
+
 
 def load_image_string(asset_name):
     '''
@@ -329,6 +419,10 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         style='{', format='{asctime} {message}', level=ERROR - args.v * 10,
         stream=sys.stderr)
 
+    plugin_version = get_plugin_version()
+    client_id = get_client_uuid()
+    info(f'Facebook Workplace version {plugin_version} starting with client ID {client_id}')
+
     # Load images that we need
     on_images = [
         load_image_string('state_mic_on.png'),
@@ -355,18 +449,26 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         load_image_string('state_call_none.png'),
     ]
 
-    async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws:
+    user_agent = f'StreamDeckWorkroomsBot/{plugin_version}'
+
+    async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws, \
+            ClientSession(headers={'User-Agent': user_agent}) as cs:
         info('established websocket connection')
+
+        analytics = partial(analytics_send, cs, 'UA-18586119-5', client_id, an='StreamDeckWorkrooms', av=plugin_version, aip=1, npa=1)
 
         # Send the handshaking message back
         msg = json.dumps({'event': args.registerEvent, 'uuid': args.pluginUUID})
         await ws.send(msg)
 
+        # Report that we've successfully started
+        await analytics(t='event', ec='System', ea='Launch')
+
         # Start up the event loop, one coroutine for each source
         done_tasks, pending_tasks = await asyncio.wait(
             [
-                sd_listen(ws),
-                state_poll(ws, on_images, off_images, unknown_images, none_images),
+                sd_listen(ws, analytics),
+                state_poll(ws, analytics, on_images, off_images, unknown_images, none_images),
             ],
             return_when=asyncio.FIRST_EXCEPTION)
 
