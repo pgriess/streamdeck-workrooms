@@ -35,6 +35,18 @@
       "SupportedInMultiActions": false,
       "Tooltip": "Toggle the hand",
       "UUID": "in.std.streamdeck.workplace.hand"
+    },
+    {
+      "Icon": "action_call",
+      "Name": "Call",
+      "States": [
+        {
+          "Image": "state_call_none"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "Toggle the call",
+      "UUID": "in.std.streamdeck.workplace.call"
     }
   ],
   "SDKVersion": 2,

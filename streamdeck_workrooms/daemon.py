@@ -51,6 +51,13 @@ action_metadata = {
         'next': ActionState(),
         'next_time': 0,
     },
+    'call': {
+        'index': 3,
+        'context': None,
+        'current': ActionState(),
+        'next': ActionState(),
+        'next_time': 0,
+    },
 }
 
 
@@ -59,6 +66,7 @@ async def state_poll(ws, on_images, off_images, unknown_images, none_images):
     MIC_INDEX = action_metadata['mic']['index']
     CAMERA_INDEX = action_metadata['camera']['index']
     HAND_INDEX = action_metadata['hand']['index']
+    CALL_INDEX = action_metadata['call']['index']
 
     while True:
         await asyncio.sleep(1)
@@ -99,7 +107,8 @@ async def state_poll(ws, on_images, off_images, unknown_images, none_images):
                 # since this is expected.
                 if status_array[HAND_INDEX] == 'UNKNOWN' and \
                         status_array[MIC_INDEX] in ['ON', 'OFF'] and \
-                        status_array[CAMERA_INDEX] in ['ON', 'OFF']:
+                        status_array[CAMERA_INDEX] in ['ON', 'OFF'] and \
+                        status_array[CALL_INDEX] in ['ON', 'OFF']:
                     status_array[HAND_INDEX] = 'NONE'
 
                 # Any entries in the status_array that are UNKNOWN mean
@@ -327,21 +336,25 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         load_image_string('state_mic_on.png'),
         load_image_string('state_camera_on.png'),
         load_image_string('state_hand_on.png'),
+        load_image_string('state_call_on.png'),
     ]
     off_images = [
         load_image_string('state_mic_off.png'),
         load_image_string('state_camera_off.png'),
         load_image_string('state_hand_off.png'),
+        load_image_string('state_call_off.png'),
     ]
     unknown_images = [
         load_image_string('state_mic_unknown.png'),
         load_image_string('state_camera_unknown.png'),
         load_image_string('state_hand_unknown.png'),
+        load_image_string('state_call_unknown.png'),
     ]
     none_images = [
         load_image_string('state_mic_none.png'),
         load_image_string('state_camera_none.png'),
         load_image_string('state_hand_none.png'),
+        load_image_string('state_call_none.png'),
     ]
 
     async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws:

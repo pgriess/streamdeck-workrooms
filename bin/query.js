@@ -9,6 +9,7 @@
     let micButtonRegex = /^(mute|unmute) microphone$/i;
     let cameraButtonRegex = /^turn (off|on) (video|camera)$/i;
     let handButtonRegex = /^(raise|lower) hand$/i;
+    let callButtonRegex = /^(join as )|(end call)/i;
     // ***** END *****
 
     // There is a post-call survey with a bunch of buttons. Detect this and
@@ -26,7 +27,7 @@
 
     let micOffRegex = /^unmute microphone$/i;
     let micOnRegex = /^mute microphone$/i;
-    let micText = Array.from(document.querySelectorAll('button'))
+    let micText = Array.from(document.querySelectorAll('span'))
         .filter((n) => { return n.textContent.match(micButtonRegex); })
         .map((n) => { return n.textContent; })
         .join('');
@@ -37,7 +38,7 @@
 
     let cameraOffRegex = /^turn on (camera|video)$/i;
     let cameraOnRegex = /^turn off (camera|video)$/i;
-    let cameraText = Array.from(document.querySelectorAll('button'))
+    let cameraText = Array.from(document.querySelectorAll('span'))
         .filter((n) => { return n.textContent.match(cameraButtonRegex); })
         .map((n) => { return n.textContent; })
         .join('');
@@ -48,7 +49,7 @@
 
     let handOffRegex = /^raise hand$/i;
     let handOnRegex = /^lower hand$/i;
-    let handText = Array.from(document.querySelectorAll('button'))
+    let handText = Array.from(document.querySelectorAll('span'))
         .filter((n) => { return n.textContent.match(handButtonRegex); })
         .map((n) => { return n.textContent; })
         .join('');
@@ -57,5 +58,15 @@
         (handText.match(handOnRegex)) ? "ON" :
         "UNKNOWN";
 
-    return [micState, cameraState, handState].join(" ");
+    let callOffRegex = /^join as /i;
+    let callOnRegex = /^end call$/i;
+    let callText = Array.from(document.querySelectorAll('span'))
+        .filter((n) => { return n.textContent.match(callButtonRegex); })
+        .map((n) => { return n.textContent; })
+        .join('');
+    let callState =
+        (callText.match(callOffRegex)) ? "OFF" :
+        (callText.match(callOnRegex)) ? "ON" : "UNKNOWN";
+
+    return [micState, cameraState, handState, callState].join(" ");
 }
