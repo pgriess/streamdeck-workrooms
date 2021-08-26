@@ -2,7 +2,7 @@ from argparse import Action, ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
 import base64
 import json
-from logging import ERROR, basicConfig, debug, error, info
+from logging import ERROR, basicConfig, error, info
 import mimetypes
 from collections import namedtuple
 import os
@@ -157,8 +157,6 @@ async def state_poll(ws, on_images, off_images, unknown_images, none_images):
             # We have no context; don't update
             if context is None:
                 continue
-
-            debug('prev={}, current={}, next={}, new={}, next_time={}, now={}'.format(prev_state, current_state, next_state, new_state, next_time, now))
 
             # Update the next state if it's changed
             if new_state != next_state:
