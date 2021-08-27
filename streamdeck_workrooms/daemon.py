@@ -315,18 +315,24 @@ async def sd_listen(ws, analytics):
 #       block the event loop because it's all async.
 #
 #       If we do that, maybe use the 'qt' paramter to track queue time.
-async def analytics_send(client_session, tid, cid, t, **kwargs):
-    params = {
+async def analytics_send(enabled, client_session, tid, cid, t, **kwargs):
+    # Limit initial parameters to what we're willing to log
+    params = { 't': t }
+    params.update(kwargs)
+    info(f'{"" if enabled else "not "}sending analytics {params}')
+
+    if not enabled:
+        return
+
+    # Update parameters with the rest of what is required
+    params.update({
         'v': 1,
         'tid': tid,
         'cid': cid,
-        't': t,
-    }
-    params.update(kwargs)
+    })
+
     data = urlencode(params).encode('utf-8')
     url = 'https://www.google-analytics.com/collect'
-
-    info(f'sending analytics {params}')
 
     try:
         await client_session.post(url, data=data)
@@ -455,11 +461,23 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
             ClientSession(headers={'User-Agent': user_agent}) as cs:
         info('established websocket connection')
 
-        analytics = partial(analytics_send, cs, 'UA-18586119-5', client_id, an='StreamDeckWorkrooms', av=plugin_version, aip=1, npa=1)
-
         # Send the handshaking message back
         msg = json.dumps({'event': args.registerEvent, 'uuid': args.pluginUUID})
         await ws.send(msg)
+
+        # TODO: Enable analytics based on the global settings which the user can
+        #       interact with via the Property Inspector
+        analytics_enabled = client_id == 'df162069-6045-18cf-745a-9c2e49b88b2a'
+
+        # Set up the callback to use for reporting analytics.
+        #
+        # We want users to have a simplified API that doesn't require global
+        # knowledge (e.g. is analytics enabled, what is the client ID , etc),
+        # but also don't want the analytics_send() function to know about
+        # globals. So, we wrap it in a partial.
+        analytics = partial(
+            analytics_send, analytics_enabled, cs, 'UA-18586119-5', client_id,
+            an='StreamDeckWorkrooms', av=plugin_version, aip=1, npa=1)
 
         # Report that we've successfully started
         await analytics(t='event', ec='System', ea='Launch')
