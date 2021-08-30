@@ -68,8 +68,8 @@ action_metadata = {
 }
 
 
-# Task to poll for state
-async def state_poll(ws, analytics, on_images, off_images, unknown_images, none_images):
+# Task to get state updates from the browser
+async def browser_listen(ws, analytics, on_images, off_images, unknown_images, none_images):
     MIC_INDEX = action_metadata['mic']['index']
     CAMERA_INDEX = action_metadata['camera']['index']
     HAND_INDEX = action_metadata['hand']['index']
@@ -220,7 +220,7 @@ async def state_poll(ws, analytics, on_images, off_images, unknown_images, none_
 
 
 # Task to listen to Stream Deck commands
-async def sd_listen(ws, analytics):
+async def streamdeck_listen(ws, analytics):
     global context_mic
 
     while True:
@@ -480,8 +480,8 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         # Start up the event loop, one coroutine for each source
         done_tasks, pending_tasks = await asyncio.wait(
             [
-                sd_listen(ws, analytics),
-                state_poll(ws, analytics, on_images, off_images, unknown_images, none_images),
+                streamdeck_listen(ws, analytics),
+                browser_listen(ws, analytics, on_images, off_images, unknown_images, none_images),
             ],
             return_when=asyncio.FIRST_EXCEPTION)
 
