@@ -1,10 +1,10 @@
-from aiohttp import ClientSession
+import analytics
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
 import base64
 from hashlib import blake2b
 import json
-from logging import ERROR, basicConfig, debug, error, info
+from logging import ERROR, basicConfig, error, info
 import mimetypes
 from collections import namedtuple
 import os
@@ -15,7 +15,6 @@ import subprocess
 import sys
 import time
 import traceback
-from urllib.parse import urlencode
 from uuid import UUID
 import websockets
 
@@ -68,7 +67,7 @@ action_metadata = {
 
 
 # Task to get state updates from the browser
-async def browser_listen(ws, analytics, on_images, off_images, unknown_images, none_images):
+async def browser_listen(ws, analytics_collect, on_images, off_images, unknown_images, none_images):
     MIC_INDEX = action_metadata['mic']['index']
     CAMERA_INDEX = action_metadata['camera']['index']
     HAND_INDEX = action_metadata['hand']['index']
@@ -148,7 +147,7 @@ async def browser_listen(ws, analytics, on_images, off_images, unknown_images, n
 
         # Report query timing, sampled at 1%
         if randint(0, 100) == 0:
-            await analytics(
+            await analytics_collect(
                 t='timing',
                 utc='query',
                 utv='subprocess',
@@ -219,7 +218,7 @@ async def browser_listen(ws, analytics, on_images, off_images, unknown_images, n
 
 
 # Task to listen to Stream Deck commands
-async def streamdeck_listen(ws, analytics):
+async def streamdeck_listen(ws, analytics_collect):
     while True:
         msg = json.loads(await ws.recv())
 
@@ -303,40 +302,7 @@ async def streamdeck_listen(ws, analytics):
             except Exception:
                 error(traceback.format_exc())
 
-            await analytics(t='event', ec='Actions', ea=action.title())
-
-
-# Task to listen for analytics events and send them
-#
-# TODO: Maybe use the 'qt' paramter to track queue time.
-async def analytics_listen(queue, client_session, tid, cid):
-    while True:
-        params = await queue.get()
-
-        # Update parameters with the rest of what is required
-        params.update({
-            'v': 1,
-            'tid': tid,
-            'cid': cid,
-        })
-
-        data = urlencode(params).encode('utf-8')
-        url = 'https://www.google-analytics.com/collect'
-
-        try:
-            await client_session.post(url, data=data)
-            info(f'analytics {params} sent')
-        except Exception:
-            error(traceback.format_exc())
-
-
-# Send analytics
-async def analytics_send(queue, t, **kwargs):
-    params = { 't': t }
-    params.update(kwargs)
-    debug(f'enqueueing analytics {params}')
-
-    await queue.put(params)
+            await analytics_collect(t='event', ec='Actions', ea=action.title())
 
 
 # Get the plugin version string from manifest.json
@@ -448,10 +414,7 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         load_image_string('state_call_none.png'),
     ]
 
-    user_agent = f'StreamDeckWorkroomsBot/{plugin_version}'
-
-    async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws, \
-            ClientSession(headers={'User-Agent': user_agent}) as cs:
+    async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws:
         info('established websocket connection')
 
         # Send the handshaking message back
@@ -469,26 +432,20 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         #
         # TODO: Enable analytics based on the global settings which the user can
         #       interact with via the Property Inspector
-        if client_id == 'cdd89ecb-0c73-b56b-c1a1-19eb15646443':
-            analytics_queue = asyncio.Queue()
-            async_tasks += [analytics_listen(analytics_queue, cs, 'UA-18586119-5', client_id)]
+        analytics_enabled = client_id == 'cdd89ecb-0c73-b56b-c1a1-19eb15646443'
+        analytics_queue = asyncio.Queue()
+        async_tasks += [
+            analytics.listen(
+                analytics_queue, analytics_enabled, 'UA-18586119-5', client_id,
+                user_agent=f'StreamDeckWorkroomsBot/{plugin_version}')]
+        analytics_collect = partial(
+            analytics.collect, analytics_queue,
+            an='StreamDeckWorkrooms', av=plugin_version, aip=1, npa=1)
 
-            # Wrap analytics_send() in a partial so that we don't leak global
-            # state into the callers or require them to pass the same
-            # boilerplate parameters repeatedly
-            analytics = partial(
-                analytics_send, analytics_queue,
-                an='StreamDeckWorkrooms', av=plugin_version, aip=1, npa=1)
-        else:
-            async def analytics_stub(**kwargs):
-                info(f'not sending analytics {kwargs}')
+        async_tasks += [streamdeck_listen(ws, analytics_collect)]
+        async_tasks += [browser_listen(ws, analytics_collect, on_images, off_images, unknown_images, none_images)]
 
-            analytics = analytics_stub
-
-        async_tasks += [streamdeck_listen(ws, analytics)]
-        async_tasks += [browser_listen(ws, analytics, on_images, off_images, unknown_images, none_images)]
-
-        await analytics(t='event', ec='System', ea='Launch')
+        await analytics_collect(t='event', ec='System', ea='Launch')
 
         done_tasks, pending_tasks = await asyncio.wait(
             async_tasks,
