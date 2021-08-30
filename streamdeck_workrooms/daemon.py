@@ -2,6 +2,7 @@ from aiohttp import ClientSession
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
 import base64
+from hashlib import blake2b
 import json
 from logging import ERROR, basicConfig, error, info
 import math
@@ -373,16 +374,10 @@ def get_client_uuid():
 
         serial = l.split(' ')[2]
 
-        seed = 0
-        for c in serial:
-            seed = seed * 256 + ord(c)
+        h = blake2b(
+            serial.encode('utf-8'), digest_size=16, salt='workrooms'.encode('utf-8'))
+        u = UUID(bytes=h.digest())
 
-        r = Random(seed)
-        b = []
-        for i in range(16):
-            b += [math.floor(r.random() * 256)]
-
-        u = UUID(bytes=bytes(b))
         return str(u)
 
     raise Exception('Failed to find serial number')
@@ -467,7 +462,7 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
 
         # TODO: Enable analytics based on the global settings which the user can
         #       interact with via the Property Inspector
-        analytics_enabled = client_id == 'df162069-6045-18cf-745a-9c2e49b88b2a'
+        analytics_enabled = client_id == 'cdd89ecb-0c73-b56b-c1a1-19eb15646443'
 
         # Set up the callback to use for reporting analytics.
         #
