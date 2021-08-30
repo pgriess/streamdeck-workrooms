@@ -4,7 +4,7 @@ import asyncio
 import base64
 from hashlib import blake2b
 import json
-from logging import ERROR, basicConfig, error, info
+from logging import ERROR, basicConfig, debug, error, info
 import math
 import mimetypes
 from collections import namedtuple
@@ -309,36 +309,37 @@ async def streamdeck_listen(ws, analytics):
             await analytics(t='event', ec='Actions', ea=action.title())
 
 
+# Task to listen for analytics events and send them
+#
+# TODO: Maybe use the 'qt' paramter to track queue time.
+async def analytics_listen(queue, client_session, tid, cid):
+    while True:
+        params = await queue.get()
+
+        # Update parameters with the rest of what is required
+        params.update({
+            'v': 1,
+            'tid': tid,
+            'cid': cid,
+        })
+
+        data = urlencode(params).encode('utf-8')
+        url = 'https://www.google-analytics.com/collect'
+
+        try:
+            await client_session.post(url, data=data)
+            info(f'analytics {params} sent')
+        except Exception:
+            error(traceback.format_exc())
+
+
 # Send analytics
-#
-# TODO: Run this in a separate coroutine and send it work by enqueueing. We
-#       don't want this work to block the work functions, even if it doesn't
-#       block the event loop because it's all async.
-#
-#       If we do that, maybe use the 'qt' paramter to track queue time.
-async def analytics_send(enabled, client_session, tid, cid, t, **kwargs):
-    # Limit initial parameters to what we're willing to log
+async def analytics_send(queue, t, **kwargs):
     params = { 't': t }
     params.update(kwargs)
-    info(f'{"" if enabled else "not "}sending analytics {params}')
+    debug(f'enqueueing analytics {params}')
 
-    if not enabled:
-        return
-
-    # Update parameters with the rest of what is required
-    params.update({
-        'v': 1,
-        'tid': tid,
-        'cid': cid,
-    })
-
-    data = urlencode(params).encode('utf-8')
-    url = 'https://www.google-analytics.com/collect'
-
-    try:
-        await client_session.post(url, data=data)
-    except Exception:
-        error(traceback.format_exc())
+    await queue.put(params)
 
 
 # Get the plugin version string from manifest.json
@@ -460,29 +461,40 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         msg = json.dumps({'event': args.registerEvent, 'uuid': args.pluginUUID})
         await ws.send(msg)
 
+        async_tasks = []
+
+        # Set up analytics
+        #
+        # Tasks interact with the analytics system by getting a callback that
+        # they can use to publich metrics. If analytics has been enabled, set up
+        # this callback and any associated infrastructure. If not, provide a
+        # stub that does not send anything.
+        #
         # TODO: Enable analytics based on the global settings which the user can
         #       interact with via the Property Inspector
-        analytics_enabled = client_id == 'cdd89ecb-0c73-b56b-c1a1-19eb15646443'
+        if client_id == 'cdd89ecb-0c73-b56b-c1a1-19eb15646443':
+            analytics_queue = asyncio.Queue()
+            async_tasks += [analytics_listen(analytics_queue, cs, 'UA-18586119-5', client_id)]
 
-        # Set up the callback to use for reporting analytics.
-        #
-        # We want users to have a simplified API that doesn't require global
-        # knowledge (e.g. is analytics enabled, what is the client ID , etc),
-        # but also don't want the analytics_send() function to know about
-        # globals. So, we wrap it in a partial.
-        analytics = partial(
-            analytics_send, analytics_enabled, cs, 'UA-18586119-5', client_id,
-            an='StreamDeckWorkrooms', av=plugin_version, aip=1, npa=1)
+            # Wrap analytics_send() in a partial so that we don't leak global
+            # state into the callers or require them to pass the same
+            # boilerplate parameters repeatedly
+            analytics = partial(
+                analytics_send, analytics_queue,
+                an='StreamDeckWorkrooms', av=plugin_version, aip=1, npa=1)
+        else:
+            async def analytics_stub(**kwargs):
+                info(f'not sending analytics {kwargs}')
 
-        # Report that we've successfully started
+            analytics = analytics_stub
+
+        async_tasks += [streamdeck_listen(ws, analytics)]
+        async_tasks += [browser_listen(ws, analytics, on_images, off_images, unknown_images, none_images)]
+
         await analytics(t='event', ec='System', ea='Launch')
 
-        # Start up the event loop, one coroutine for each source
         done_tasks, pending_tasks = await asyncio.wait(
-            [
-                streamdeck_listen(ws, analytics),
-                browser_listen(ws, analytics, on_images, off_images, unknown_images, none_images),
-            ],
+            async_tasks,
             return_when=asyncio.FIRST_EXCEPTION)
 
         # If one of the tasks exited due to an exception, just re-raise it to
