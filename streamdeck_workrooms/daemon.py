@@ -220,8 +220,6 @@ async def browser_listen(ws, analytics, on_images, off_images, unknown_images, n
 
 # Task to listen to Stream Deck commands
 async def streamdeck_listen(ws, analytics):
-    global context_mic
-
     while True:
         msg = json.loads(await ws.recv())
 
