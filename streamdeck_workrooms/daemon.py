@@ -398,7 +398,7 @@ def load_image_string(asset_name):
         return 'data:{};base64,{}'.format(mt, content)
 
 
-async def main():
+async def main_async():
     ap = ArgumentParser(
         description='''
 Command handler for an Elgato Stream Deck plugin for Facebook actions.
@@ -504,5 +504,10 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
 
         info('event loop exited')
 
+
+def main():
+    asyncio.run(main_async())
+
+
 if __name__ == '__main__':
-    asyncio.run(main())
+    main()
