@@ -5,13 +5,12 @@ import base64
 from hashlib import blake2b
 import json
 from logging import ERROR, basicConfig, debug, error, info
-import math
 import mimetypes
 from collections import namedtuple
 import os
 import os.path
 from functools import partial
-from random import Random, randint
+from random import randint
 import subprocess
 import sys
 import time
