@@ -9,7 +9,9 @@ PLUGIN_FILE=$(DIST_DIR)/$(PLUGIN_ID).streamDeckPlugin
 
 ASSETS=$(wildcard $(ROOT_DIR)/assets/*.png)
 BINARIES=$(wildcard $(ROOT_DIR)/bin/*)
-SOURCES=$(shell find $(ROOT_DIR)/streamdeck_workrooms -name '*.py')
+
+SOURCES = daemon.py
+SOURCES += $(shell find $(ROOT_DIR)/streamdeck_workrooms -name '*.py')
 
 .PHONY: clean install plugin
 
@@ -24,7 +26,7 @@ $(DIST_DIR)/daemon: $(SOURCES)
 	$(ROOT_DIR)/env/bin/pyinstaller -Fc \
 		--collect-submodules=websockets \
 		-n $$(basename $@) --distpath=$$(dirname $@) \
-		./streamdeck_workrooms/daemon.py
+		$(ROOT_DIR)/daemon.py
 
 # Sometimes osascript fails with "Stream got an error: User cancelled"; ignore
 # this with the '|| true' clause

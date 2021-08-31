@@ -1,4 +1,5 @@
-import analytics
+from . import analytics
+
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
 import base64
