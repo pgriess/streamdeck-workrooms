@@ -6,14 +6,11 @@ from streamdeck_workrooms.types import ActionState
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
 from collections import defaultdict
-from hashlib import blake2b
 import json
 from logging import ERROR, basicConfig, info
-import os.path
 from functools import partial
-import subprocess
 import sys
-from uuid import UUID
+from uuid import uuid4
 import websockets
 
 
@@ -57,41 +54,6 @@ def get_plugin_version():
         return jo['Version']
 
 
-# Get a stable client UUID based on the serial number of the connected Stream
-# Deck device
-def get_client_uuid():
-    out = subprocess.check_output(
-        ('system_profiler', 'SPUSBDataType'),
-        stderr=subprocess.DEVNULL)
-
-    # TODO: Harden parsing here to handle the case where the device does not have a
-    #       serial number. I'm not sure this could happen, but if it does we'd want
-    #       to make sure that we fail rather than grab whatever the next serial
-    #       number happens to be (especially if the next one is 0 which is common).
-    found_device = False
-    for l in out.decode('utf-8').split('\n'):
-        l = l.strip()
-
-        if not found_device:
-            if 'Stream Deck' in l:
-                found_device = True
-
-            continue
-
-        if not l.startswith('Serial Number: '):
-            continue
-
-        serial = l.split(' ')[2]
-
-        h = blake2b(
-            serial.encode('utf-8'), digest_size=16, salt='workrooms'.encode('utf-8'))
-        u = UUID(bytes=h.digest())
-
-        return str(u)
-
-    raise Exception('Failed to find serial number')
-
-
 async def main_async():
     ap = ArgumentParser(
         description='''
@@ -115,8 +77,7 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         stream=sys.stderr)
 
     plugin_version = get_plugin_version()
-    client_id = get_client_uuid()
-    info(f'Facebook Workplace version {plugin_version} starting with client ID {client_id}')
+    info(f'Facebook Workplace version {plugin_version} starting')
 
     # Load images that we need
     images = defaultdict(list)
@@ -130,25 +91,49 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         info('established websocket connection')
 
         # Send the handshaking message back
-        msg = json.dumps({'event': args.registerEvent, 'uuid': args.pluginUUID})
-        await ws.send(msg)
+        await ws.send(
+            json.dumps({'event': args.registerEvent, 'uuid': args.pluginUUID}))
+
+        # Get global plugin settings
+        #
+        # This requires a round-trip to Stream Deck -- we send a
+        # getGlobalSettings message and then get back didReceiveGlobalSettings.
+        # Doing this during startup is a bit tricky since Stream Deck is going
+        # to send us some other messages as part of the process of bringing
+        # things up, e.g. deviceDidConnect and willAppear, etc. Ignore anythig
+        # other than the global settings. In the future, maybe we'll care about
+        # these other messages which will require a re-structuring here.
+        await ws.send(
+            json.dumps({'event': 'getGlobalSettings', 'context': args.pluginUUID}))
+
+        settings = {}
+        while not settings:
+            msg = json.loads(await ws.recv())
+            if msg['event'] != 'didReceiveGlobalSettings':
+                continue
+
+            settings = msg['payload']['settings']
+
+            # We didn't have any settings, create and store them
+            if not settings:
+                settings = {'client_id': str(uuid4())}
+                await ws.send(
+                    json.dumps({
+                        'event': 'setGlobalSettings',
+                        'context': args.pluginUUID,
+                        'payload': settings}))
 
         async_tasks = []
 
         # Set up analytics
         #
         # Tasks interact with the analytics system by getting a callback that
-        # they can use to publich metrics. If analytics has been enabled, set up
-        # this callback and any associated infrastructure. If not, provide a
-        # stub that does not send anything.
-        #
-        # TODO: Enable analytics based on the global settings which the user can
-        #       interact with via the Property Inspector
-        analytics_enabled = client_id == 'cdd89ecb-0c73-b56b-c1a1-19eb15646443'
+        # they can use to publich metrics. Set up this callback and any
+        # associated infrastructure.
         analytics_queue = asyncio.Queue()
         async_tasks += [
             analytics.listen(
-                analytics_queue, analytics_enabled, 'UA-18586119-5', client_id,
+                analytics_queue, True, 'UA-18586119-5', settings['client_id'],
                 user_agent=f'StreamDeckWorkroomsBot/{plugin_version}')]
         analytics_collect = partial(
             analytics.collect, analytics_queue,
