@@ -1,13 +1,12 @@
 from . import analytics
+from . import streamdeck
+from .types import ActionState
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
-import base64
 from hashlib import blake2b
 import json
 from logging import ERROR, basicConfig, error, info
-import mimetypes
-from collections import namedtuple
 import os
 import os.path
 from functools import partial
@@ -28,10 +27,6 @@ ERROR_GRACE_PERIOD_SECONDS = 5
 EC_QUERY_SUBPROCESS_FAILED = 'E1'
 EC_QUERY_DOM_FAILED = 'E2'
 EC_CHROME_APPLESCRIPT_DISABLED = 'E3'
-
-
-# State of an action
-ActionState = namedtuple('ActionStatus', ['status', 'error'], defaults=[None, None])
 
 
 # Global state for each action
@@ -218,94 +213,6 @@ async def browser_listen(ws, analytics_collect, on_images, off_images, unknown_i
                         'payload': {'title': current_state.error}}))
 
 
-# Task to listen to Stream Deck commands
-async def streamdeck_listen(ws, analytics_collect):
-    while True:
-        msg = json.loads(await ws.recv())
-
-        event = msg.get('event')
-        now = time.time()
-
-        # I'm not sure why this could happen, but all messages that we currently
-        # handle require it, so just check up-front
-        if 'action' not in msg:
-            continue
-
-        action = msg['action'].split('.')[-1]
-        data = action_metadata[action]
-
-        # XXX: This assumes that we only have one action of a given type
-        #      active at once. I don't think that is actually the case.
-        if event == 'willAppear' or event == 'willDisappear':
-            context = msg['context']
-
-            if event == 'willAppear':
-                action_metadata[action]['context'] = context
-            else:
-                action_metadata[action]['context'] = None
-                action_metadata[action]['current'] = ActionState()
-                action_metadata[action]['next'] = ActionState()
-                action_metadata[action]['next_time'] = now
-
-            continue
-
-        if event == 'keyUp':
-            state = data['current']
-
-            # We have no idea what the current state is; do nothing
-            if state.status is None:
-                continue
-
-            # We have an error; direct the user to the help page for this error
-            if state.error is not None:
-                info('opening up the help page for error {}'.format(state.error))
-                await ws.send(json.dumps({
-                    'event': 'openUrl',
-                    'context': context,
-                    'payload': {
-                        'url': 'https://github.com/pgriess/streamdeck-workrooms/wiki/Errors#{}'.format(state.error.lower())
-                    }
-                }))
-
-                continue
-
-            # We have an unexpected status; direct the user to the help page for this status
-            if state.status in ['NONE', 'UNKNOWN']:
-                info('opening up the help page')
-                await ws.send(json.dumps({
-                    'event': 'openUrl',
-                    'context': context,
-                    'payload': {
-                        'url': 'https://github.com/pgriess/streamdeck-workrooms/wiki/Help'
-                    }
-                }))
-
-                continue
-
-            info('toggling {} status'.format(action))
-            try:
-                proc = await asyncio.create_subprocess_exec(
-                    os.path.join(os.path.curdir, 'toggle_browser_state.osa'),
-                    action,
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE)
-
-                out, err = await proc.communicate()
-                out = out.decode('utf-8').strip()
-                err = err.decode('utf-8').strip()
-
-                if proc.returncode != 0:
-                    error('toggle failed with status {}\nstdout={}\nstderr={}'.format(
-                        proc.returncode,
-                        out,
-                        err))
-
-            except Exception:
-                error(traceback.format_exc())
-
-            await analytics_collect(t='event', ec='Actions', ea=action.title())
-
-
 # Get the plugin version string from manifest.json
 def get_plugin_version():
     with open('manifest.json', encoding='utf-8') as f:
@@ -348,21 +255,6 @@ def get_client_uuid():
     raise Exception('Failed to find serial number')
 
 
-def load_image_string(asset_name):
-    '''
-    Return a string-ified representation of the given asset, suitable for
-    passing to SD via setImage command.
-    '''
-
-    fp = os.path.join(os.path.curdir, asset_name)
-    mt, _ = mimetypes.guess_type(fp)
-    assert mt is not None
-
-    with open(fp, 'rb') as f:
-        content = base64.b64encode(f.read()).decode()
-        return 'data:{};base64,{}'.format(mt, content)
-
-
 async def main_async():
     ap = ArgumentParser(
         description='''
@@ -391,28 +283,28 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
 
     # Load images that we need
     on_images = [
-        load_image_string('state_mic_on.png'),
-        load_image_string('state_camera_on.png'),
-        load_image_string('state_hand_on.png'),
-        load_image_string('state_call_on.png'),
+        streamdeck.load_image_string('state_mic_on.png'),
+        streamdeck.load_image_string('state_camera_on.png'),
+        streamdeck.load_image_string('state_hand_on.png'),
+        streamdeck.load_image_string('state_call_on.png'),
     ]
     off_images = [
-        load_image_string('state_mic_off.png'),
-        load_image_string('state_camera_off.png'),
-        load_image_string('state_hand_off.png'),
-        load_image_string('state_call_off.png'),
+        streamdeck.load_image_string('state_mic_off.png'),
+        streamdeck.load_image_string('state_camera_off.png'),
+        streamdeck.load_image_string('state_hand_off.png'),
+        streamdeck.load_image_string('state_call_off.png'),
     ]
     unknown_images = [
-        load_image_string('state_mic_unknown.png'),
-        load_image_string('state_camera_unknown.png'),
-        load_image_string('state_hand_unknown.png'),
-        load_image_string('state_call_unknown.png'),
+        streamdeck.load_image_string('state_mic_unknown.png'),
+        streamdeck.load_image_string('state_camera_unknown.png'),
+        streamdeck.load_image_string('state_hand_unknown.png'),
+        streamdeck.load_image_string('state_call_unknown.png'),
     ]
     none_images = [
-        load_image_string('state_mic_none.png'),
-        load_image_string('state_camera_none.png'),
-        load_image_string('state_hand_none.png'),
-        load_image_string('state_call_none.png'),
+        streamdeck.load_image_string('state_mic_none.png'),
+        streamdeck.load_image_string('state_camera_none.png'),
+        streamdeck.load_image_string('state_hand_none.png'),
+        streamdeck.load_image_string('state_call_none.png'),
     ]
 
     async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws:
@@ -443,7 +335,7 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
             analytics.collect, analytics_queue,
             an='StreamDeckWorkrooms', av=plugin_version, aip=1, npa=1)
 
-        async_tasks += [streamdeck_listen(ws, analytics_collect)]
+        async_tasks += [streamdeck.listen(ws, analytics_collect, action_metadata)]
         async_tasks += [browser_listen(ws, analytics_collect, on_images, off_images, unknown_images, none_images)]
 
         await analytics_collect(t='event', ec='System', ea='Launch')
