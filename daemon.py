@@ -5,10 +5,10 @@ from streamdeck_workrooms.types import ActionState
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import asyncio
+from collections import defaultdict
 from hashlib import blake2b
 import json
 from logging import ERROR, basicConfig, info
-import os
 import os.path
 from functools import partial
 import subprocess
@@ -119,30 +119,12 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
     info(f'Facebook Workplace version {plugin_version} starting with client ID {client_id}')
 
     # Load images that we need
-    on_images = [
-        streamdeck.load_image_string('state_mic_on.png'),
-        streamdeck.load_image_string('state_camera_on.png'),
-        streamdeck.load_image_string('state_hand_on.png'),
-        streamdeck.load_image_string('state_call_on.png'),
-    ]
-    off_images = [
-        streamdeck.load_image_string('state_mic_off.png'),
-        streamdeck.load_image_string('state_camera_off.png'),
-        streamdeck.load_image_string('state_hand_off.png'),
-        streamdeck.load_image_string('state_call_off.png'),
-    ]
-    unknown_images = [
-        streamdeck.load_image_string('state_mic_unknown.png'),
-        streamdeck.load_image_string('state_camera_unknown.png'),
-        streamdeck.load_image_string('state_hand_unknown.png'),
-        streamdeck.load_image_string('state_call_unknown.png'),
-    ]
-    none_images = [
-        streamdeck.load_image_string('state_mic_none.png'),
-        streamdeck.load_image_string('state_camera_none.png'),
-        streamdeck.load_image_string('state_hand_none.png'),
-        streamdeck.load_image_string('state_call_none.png'),
-    ]
+    images = defaultdict(list)
+    for state in ['ON', 'OFF', 'UNKNOWN', 'NONE']:
+        for action in ['mic', 'camera', 'hand', 'call']:
+            images[state] += [
+                streamdeck.load_image_string(
+                    f'state_{action}_{state.lower()}.png')]
 
     async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws:
         info('established websocket connection')
@@ -173,7 +155,10 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
             an='StreamDeckWorkrooms', av=plugin_version, aip=1, npa=1)
 
         async_tasks += [streamdeck.listen(ws, analytics_collect, action_metadata)]
-        async_tasks += [browser.listen(ws, analytics_collect, action_metadata, on_images, off_images, unknown_images, none_images)]
+        async_tasks += [
+            browser.listen(
+                ws, analytics_collect, action_metadata,
+                images['ON'], images['OFF'], images['UNKNOWN'], images['NONE'])]
 
         await analytics_collect(t='event', ec='System', ea='Launch')
 
