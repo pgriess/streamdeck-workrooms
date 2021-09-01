@@ -19,9 +19,10 @@ ERROR_GRACE_PERIOD_SECONDS = 5
 
 
 # User-facing error codes
-EC_QUERY_SUBPROCESS_FAILED = 'E1'
+EC_QUERY_SUBPROCESS_FAILED_STATUS = 'E1'
 EC_QUERY_DOM_FAILED = 'E2'
 EC_CHROME_APPLESCRIPT_DISABLED = 'E3'
+EC_QUERY_SUBPROCESS_FAILED_EXCEPTION = 'E4'
 
 
 async def listen(ws, analytics_collect, action_metadata, on_images, off_images, unknown_images, none_images):
@@ -99,9 +100,8 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
             else:
                 error('query failed with status {}\nstdout={}\nstderr={}'.format(proc.returncode, out, err))
 
-                # Compute the error code, defaulting to the generic
-                # EC_QUERY_SUBPROCESS_FAILED
-                ec = EC_QUERY_SUBPROCESS_FAILED
+                # Compute the error code, defaulting to something generic
+                ec = EC_QUERY_SUBPROCESS_FAILED_STATUS
                 if 'Executing JavaScript through AppleScript is turned off' in err:
                     ec = EC_CHROME_APPLESCRIPT_DISABLED
 
@@ -112,10 +112,8 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
 
         except Exception:
             error(traceback.format_exc())
-            await analytics_collect(t='exception', exd='QueryException', exf=0)
-
             status_array = ['UNKNOWN'] * len(action_metadata)
-            errors_array = [EC_QUERY_SUBPROCESS_FAILED] * len(action_metadata)
+            errors_array = [EC_QUERY_SUBPROCESS_FAILED_EXCEPTION] * len(action_metadata)
 
         # Report query timing, sampled at 1%
         if randint(0, 100) == 0:
