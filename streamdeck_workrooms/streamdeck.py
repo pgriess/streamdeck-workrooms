@@ -107,9 +107,11 @@ async def process_message(msg, now, ws, analytics_collect, action_metadata):
                     proc.returncode,
                     out,
                     err))
+                await analytics_collect(t='exception', exd='ToggleError', exf=0)
 
         except Exception:
             error(traceback.format_exc())
+            await analytics_collect(t='exception', exd='ToggleException', exf=0)
 
         if analytics_collect:
             await analytics_collect(t='event', ec='Actions', ea=action.title())

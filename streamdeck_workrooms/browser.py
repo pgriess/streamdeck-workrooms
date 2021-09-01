@@ -71,6 +71,9 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
                 # come back from the query as UNKNOWN. In this case, don't show
                 # the user the confusing UNKNOWN icon. Just consider it NONE
                 # since this is expected.
+                #
+                # XXX: Need similar logic for 'call' button else we'll see
+                #      DOM_FAILED when connecting a call (when the button disappears).
                 if status_array[HAND_INDEX] == 'UNKNOWN' and \
                         status_array[MIC_INDEX] in ['ON', 'OFF'] and \
                         status_array[CAMERA_INDEX] in ['ON', 'OFF'] and \
@@ -89,6 +92,10 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
                         continue
 
                     errors_array[index] = EC_QUERY_DOM_FAILED
+                    await analytics_collect(
+                        t='exception',
+                        exd=f'QueryError{EC_QUERY_DOM_FAILED}',
+                        exf=0)
             else:
                 error('query failed with status {}\nstdout={}\nstderr={}'.format(proc.returncode, out, err))
 
@@ -101,8 +108,12 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
                 status_array = ['UNKNOWN'] * len(action_metadata)
                 errors_array = [ec] * len(action_metadata)
 
+                await analytics_collect(t='exception', exd=f'QueryError{ec}', exf=0)
+
         except Exception:
             error(traceback.format_exc())
+            await analytics_collect(t='exception', exd='QueryException', exf=0)
+
             status_array = ['UNKNOWN'] * len(action_metadata)
             errors_array = [EC_QUERY_SUBPROCESS_FAILED] * len(action_metadata)
 
@@ -163,6 +174,7 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
                 elif current_state.status in ['NONE', 'UNKNOWN']:
                     msg['payload']['image'] = none_images[index]
                 else:
+                    # TODO: Handle this some other way. This terminates the process.
                     raise Exception('Unexpected status {}'.format(current_state.status))
 
                 await ws.send(json.dumps(msg))
