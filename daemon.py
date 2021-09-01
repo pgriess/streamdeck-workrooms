@@ -23,6 +23,7 @@ action_metadata = {
         'current': ActionState(),
         'next': ActionState(),
         'next_time': 0,
+        'action_time': None,
     },
     'camera': {
         'index': 1,
@@ -30,6 +31,7 @@ action_metadata = {
         'current': ActionState(),
         'next': ActionState(),
         'next_time': 0,
+        'action_time': None,
     },
     'hand': {
         'index': 2,
@@ -37,6 +39,7 @@ action_metadata = {
         'current': ActionState(),
         'next': ActionState(),
         'next_time': 0,
+        'action_time': None,
     },
     'call': {
         'index': 3,
@@ -44,6 +47,7 @@ action_metadata = {
         'current': ActionState(),
         'next': ActionState(),
         'next_time': 0,
+        'action_time': None,
     },
 }
 

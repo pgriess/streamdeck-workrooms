@@ -50,6 +50,7 @@ async def process_message(msg, now, ws, analytics_collect, action_metadata):
         data['current'] = ActionState()
         data['next'] = ActionState()
         data['next_time'] = now
+        data['action_time'] = None
         return
 
     if event == 'keyUp':
@@ -108,6 +109,8 @@ async def process_message(msg, now, ws, analytics_collect, action_metadata):
                     out,
                     err))
                 await analytics_collect(t='exception', exd='ToggleError', exf=0)
+            else:
+                data['action_time'] = now
 
         except Exception:
             error(traceback.format_exc())

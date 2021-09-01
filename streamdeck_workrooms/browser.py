@@ -154,6 +154,22 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
             # Update the status if necessary
             if prev_state.status != current_state.status:
                 info('{} status changed from {} to {}'.format(name, prev_state.status, current_state.status))
+                
+                # If we've transitioned to a "good" state and the user has
+                # pressed a button to initate this change, track and report the
+                # time from press to state change.
+                if current_state.status in ['ON', 'OFF'] and \
+                        data['action_time'] is not None:
+                    latency = now - data['action_time']
+                    await analytics_collect(
+                        t='timing',
+                        utc='toggle',
+                        utv=name,
+                        utt=int(latency * 1000))
+
+                # No matter what, any attempt by the user to toggle the state is
+                # now stale; reset it
+                data['action_time'] = None
 
                 msg = {'event': 'setImage', 'context': context, 'payload': {}}
                 if current_state.status == 'OFF':
