@@ -10,6 +10,7 @@ import json
 from logging import ERROR, basicConfig, info
 from functools import partial
 import sys
+import time
 from uuid import uuid4
 import websockets
 
@@ -87,8 +88,12 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
                 streamdeck.load_image_string(
                     f'state_{action}_{state.lower()}.png')]
 
+    # Daemon main loop
+    #
+    # Establish the WebSocket connection, do some setup, start up some
+    # coroutines, and then wait for them to exist.
     async with websockets.connect('ws://127.0.0.1:{}'.format(args.port)) as ws:
-        info('established websocket connection')
+        async_tasks = []
 
         # Send the handshaking message back
         await ws.send(
@@ -100,16 +105,18 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         # getGlobalSettings message and then get back didReceiveGlobalSettings.
         # Doing this during startup is a bit tricky since Stream Deck is going
         # to send us some other messages as part of the process of bringing
-        # things up, e.g. deviceDidConnect and willAppear, etc. Ignore anythig
-        # other than the global settings. In the future, maybe we'll care about
-        # these other messages which will require a re-structuring here.
+        # things up, e.g. deviceDidConnect and willAppear, etc. Process those
+        # messages inline and then handle didReceiveGlobalSettings directly.
         await ws.send(
             json.dumps({'event': 'getGlobalSettings', 'context': args.pluginUUID}))
 
         settings = {}
         while not settings:
             msg = json.loads(await ws.recv())
+            now = time.time()
+
             if msg['event'] != 'didReceiveGlobalSettings':
+                await streamdeck.process_message(msg, now, ws, None, action_metadata)
                 continue
 
             settings = msg['payload']['settings']
@@ -123,30 +130,30 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
                         'context': args.pluginUUID,
                         'payload': settings}))
 
-        async_tasks = []
-
         # Set up analytics
         #
         # Tasks interact with the analytics system by getting a callback that
-        # they can use to publich metrics. Set up this callback and any
-        # associated infrastructure.
+        # they can use to publich metrics. Set up this callback and associated
+        # infrastructure.
         analytics_queue = asyncio.Queue()
-        async_tasks += [
-            analytics.listen(
-                analytics_queue, True, 'UA-18586119-5', settings['client_id'],
-                user_agent=f'StreamDeckWorkroomsBot/{plugin_version}')]
         analytics_collect = partial(
             analytics.collect, analytics_queue,
             an='StreamDeckWorkrooms', av=plugin_version, aip=1, npa=1)
 
+        # Start up coroutines
         async_tasks += [streamdeck.listen(ws, analytics_collect, action_metadata)]
         async_tasks += [
             browser.listen(
                 ws, analytics_collect, action_metadata,
                 images['ON'], images['OFF'], images['UNKNOWN'], images['NONE'])]
+        async_tasks += [
+            analytics.listen(
+                analytics_queue, True, 'UA-18586119-5', settings['client_id'],
+                user_agent=f'StreamDeckWorkroomsBot/{plugin_version}')]
 
         await analytics_collect(t='event', ec='System', ea='Launch')
 
+        # Wait for tasks to complete
         done_tasks, pending_tasks = await asyncio.wait(
             async_tasks,
             return_when=asyncio.FIRST_EXCEPTION)
@@ -156,8 +163,6 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
         for dt in done_tasks:
             if dt.exception() is not None:
                 raise dt.exception()
-
-        info('event loop exited')
 
 
 def main():
