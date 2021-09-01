@@ -90,10 +90,6 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
                         continue
 
                     errors_array[index] = EC_QUERY_DOM_FAILED
-                    await analytics_collect(
-                        t='exception',
-                        exd=f'QueryError{EC_QUERY_DOM_FAILED}',
-                        exf=0)
             else:
                 error('query failed with status {}\nstdout={}\nstderr={}'.format(proc.returncode, out, err))
 
@@ -104,8 +100,6 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
 
                 status_array = ['UNKNOWN'] * len(action_metadata)
                 errors_array = [ec] * len(action_metadata)
-
-                await analytics_collect(t='exception', exd=f'QueryError{ec}', exf=0)
 
         except Exception:
             error(traceback.format_exc())
@@ -166,17 +160,25 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
                     msg['payload']['image'] = off_images[index]
                 elif current_state.status == 'ON':
                     msg['payload']['image'] = on_images[index]
-                elif current_state.status in ['NONE', 'UNKNOWN']:
-                    msg['payload']['image'] = none_images[index]
                 else:
-                    # TODO: Handle this some other way. This terminates the process.
-                    raise Exception('Unexpected status {}'.format(current_state.status))
+                    msg['payload']['image'] = none_images[index]
+
+                    if current_state.status not in ['NONE', 'UNKNOWN']:
+                        error(f'Unexpected status {current_state.status}')
+                        await analytics_collect(
+                            t='exception',
+                            exd=f'{name.title()}UnexpectedState{current_state.status}',
+                            exf=0)
 
                 await ws.send(json.dumps(msg))
 
             # Update the error if necessary
             if prev_state.error != current_state.error:
                 info('{} error changed from {} to {}'.format(name, prev_state.error, current_state.error))
+
+                if current_state.error is not None:
+                    await analytics_collect(
+                        t='exception', exd=f'{name.title()}Error{current_state.error}', exf=0)
 
                 await ws.send(
                     json.dumps({
