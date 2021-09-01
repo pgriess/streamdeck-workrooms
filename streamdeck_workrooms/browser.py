@@ -72,9 +72,6 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
                 # come back from the query as UNKNOWN. In this case, don't show
                 # the user the confusing UNKNOWN icon. Just consider it NONE
                 # since this is expected.
-                #
-                # XXX: Need similar logic for 'call' button else we'll see
-                #      DOM_FAILED when connecting a call (when the button disappears).
                 if status_array[HAND_INDEX] == 'UNKNOWN' and \
                         status_array[MIC_INDEX] in ['ON', 'OFF'] and \
                         status_array[CAMERA_INDEX] in ['ON', 'OFF'] and \
