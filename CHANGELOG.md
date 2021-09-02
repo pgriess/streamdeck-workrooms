@@ -1,3 +1,8 @@
+# 2.0
+- Add new action to connect or disconnect from a workroom
+- Slight visual tweaks to icons
+- Collect anonymized analytics on usage, errors, and performance
+
 # 1.0.2
 - Don't start Chrome if it's not already running
 - Fix bug where a user screen sharing could confuse the query system
