@@ -53,10 +53,16 @@ Build a new release package
 make plugin
 ```
 
+Create a new release on GitHub by going to the
+[releases](https://github.com/pgriess/streamdeck-workrooms/releases/) page,
+filling out the form, and attaching the plugin built above. The text associated
+with the release should include the release notes (probably from
+`CHANGELOG.md`).
+
 Send an email to to `streamdeck.elgato@corsair.com` with the following information
 
 - Release notes. Probably cribbed from `CHANGELOG.md`, but filtered to be a
   bit more user-friendly.
 
-- A link from which the new plugin can be downloaded. I've been using a
-  Dropbox folder for this.
+- A link from which the new plugin can be downloaded. Binaries attached to
+  GitHub releases can be downloaded without authentication.
