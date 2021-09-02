@@ -7,11 +7,11 @@ The general rule for releases is as follows.
   refactoring
 - Patch releases are exclusively bug fixes
 
-Release numbers are named `X.Y.Z`.
+Release numbers are numbered `X.Y.Z`.
 
-Branches are named `vX.Y`.
+Release branches are named `release-vX.Y`.
 
-Each release has a tag named `release-vX.Y.Z`.
+Each release has a tag named `vX.Y.Z`.
 
 The `CHANGELOG.md` file contains a developer-centric changelog of differences
 since the last numerical version. That is, in the main branch this file should
@@ -25,13 +25,13 @@ Major and minor releases have their own branch. If this is the first version of
 such a release, create a new branch for it.
 
 ```sh
-git branch vX.Y HEAD
+git branch release-vX.Y HEAD
 ```
 
 Create a tag for the release for the tip of the new branch.
 
 ```sh
-git tag release-vX.Y.Z vX.Y
+git tag vX.Y.Z release-vX.Y
 ```
 
 Make sure that `manifest.json` is updated to refer to the **next** release. For
