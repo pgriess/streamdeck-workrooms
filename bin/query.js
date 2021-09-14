@@ -9,7 +9,7 @@
     let micButtonRegex = /^(mute|unmute) microphone$/i;
     let cameraButtonRegex = /^turn (off|on) (video|camera)$/i;
     let handButtonRegex = /^(raise|lower) hand$/i;
-    let callButtonRegex = /^(join as )|(end call)/i;
+    let callButtonRegex = /^(join as )|(join room)|(end call)/i;
     // ***** END *****
 
     // Detect post-call screens and short-circuit the rest of the checks.
@@ -63,6 +63,10 @@
     let handOffRegex = /^raise hand$/i;
     let handOnRegex = /^lower hand$/i;
     let handText = Array.from(document.querySelectorAll('span'))
+        // Node.textContent rolls up text from all child nodes. If there are
+        // nested spans, this will cause /all/ of the spans to match. Really we
+        // just want the leaf. Strip out all nodes that have children.
+        .filter((n) => { return n.childElementCount === 0 })
         .filter((n) => { return n.textContent.match(handButtonRegex); })
         .map((n) => { return n.textContent; })
         .join('');
@@ -71,9 +75,13 @@
         (handText.match(handOnRegex)) ? "ON" :
         "UNKNOWN";
 
-    let callOffRegex = /^join as /i;
+    let callOffRegex = /^(join as )|(join room)/i;
     let callOnRegex = /^end call$/i;
     let callText = Array.from(document.querySelectorAll('span'))
+        // Node.textContent rolls up text from all child nodes. If there are
+        // nested spans, this will cause /all/ of the spans to match. Really we
+        // just want the leaf. Strip out all nodes that have children.
+        .filter((n) => { return n.childElementCount === 0 })
         .filter((n) => { return n.textContent.match(callButtonRegex); })
         .map((n) => { return n.textContent; })
         .join('');
