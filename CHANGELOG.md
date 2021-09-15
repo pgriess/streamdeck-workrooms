@@ -1,3 +1,4 @@
+# 2.0.1
 - Fix issue with the "call" button in some pre-call screens
 
 # 2.0
