@@ -1,3 +1,5 @@
+- Fix issue with the "call" button in some pre-call screens
+
 # 2.0
 - Add new action to connect or disconnect from a workroom
 - Slight visual tweaks to icons
