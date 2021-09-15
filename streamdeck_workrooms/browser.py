@@ -106,12 +106,11 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
             status_array = ['UNKNOWN'] * len(action_metadata)
             errors_array = [EC_QUERY_SUBPROCESS_FAILED_EXCEPTION] * len(action_metadata)
 
-        # Report query timing, sampled at 1%
         if randint(0, 100) == 0:
             await analytics_collect(
                 t='timing',
-                utc='query',
-                utv='subprocess',
+                utc='Query',
+                utv='Subprocess',
                 utt=int((time.time() - now) * 1000))
 
         assert len(status_array) == len(action_metadata)
@@ -163,8 +162,8 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
                     latency = now - data['action_time']
                     await analytics_collect(
                         t='timing',
-                        utc='toggle',
-                        utv=name,
+                        utc='Toggle',
+                        utv=name.title(),
                         utt=int(latency * 1000))
 
                 # No matter what, any attempt by the user to toggle the state is
