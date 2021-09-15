@@ -154,7 +154,7 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
             # Update the status if necessary
             if prev_state.status != current_state.status:
                 info('{} status changed from {} to {}'.format(name, prev_state.status, current_state.status))
-                
+
                 # If we've transitioned to a "good" state and the user has
                 # pressed a button to initate this change, track and report the
                 # time from press to state change.
