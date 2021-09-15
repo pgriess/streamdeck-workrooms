@@ -58,7 +58,7 @@
   "Name": "Facebook Workplace",
   "Icon": "store",
   "URL": "https://github.com/pgriess/streamdeck-workrooms/wiki",
-  "Version": "2.0",
+  "Version": "2.0.1",
   "OS": [
     {
         "Platform": "mac",
