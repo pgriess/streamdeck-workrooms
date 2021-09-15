@@ -155,8 +155,6 @@ Command handler for an Elgato Stream Deck plugin for Facebook actions.
                 analytics_queue, True, 'UA-18586119-5', settings['client_id'],
                 user_agent=f'StreamDeckWorkroomsBot/{plugin_version}')]
 
-        await analytics_collect(t='event', ec='System', ea='Launch')
-
         # Wait for tasks to complete
         done_tasks, pending_tasks = await asyncio.wait(
             async_tasks,

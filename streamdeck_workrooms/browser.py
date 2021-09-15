@@ -24,6 +24,17 @@ EC_QUERY_DOM_FAILED = 'E2'
 EC_CHROME_APPLESCRIPT_DISABLED = 'E3'
 EC_QUERY_SUBPROCESS_FAILED_EXCEPTION = 'E4'
 
+def is_call_active(action_metadata):
+    '''
+    Is there an active call?
+    '''
+
+    for av in action_metadata.values():
+        if av['current'].status in ['ON', 'OFF']:
+            return True
+
+    return False
+
 
 async def listen(ws, analytics_collect, action_metadata, on_images, off_images, unknown_images, none_images):
     '''
@@ -39,8 +50,24 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
         await asyncio.sleep(1)
 
         now = time.time()
+        in_call = is_call_active(action_metadata)
         status_array = [None] * len(action_metadata)
         errors_array = [None] * len(action_metadata)
+
+        # Only collect analytics if we're in a call.
+        #
+        # GA has a limit of 500 events per session. If you go beyond that, your
+        # session (and seemingly client_id) is blackholed. To address this,
+        # define our session as when we're in a call and only report analytics
+        # when this is true.
+        #
+        # See #40.
+        async def analytics_collect_session(*args, **kwargs):
+            if not in_call:
+                info(f'swallowing analytics for inactive session: {args}, {kwargs}')
+                return
+
+            await analytics_collect(*args, **kwargs)
 
         # Fill in the *_array values by querying browser
         #
@@ -107,7 +134,7 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
             errors_array = [EC_QUERY_SUBPROCESS_FAILED_EXCEPTION] * len(action_metadata)
 
         if randint(0, 100) == 0:
-            await analytics_collect(
+            await analytics_collect_session(
                 t='timing',
                 utc='Query',
                 utv='Subprocess',
@@ -160,7 +187,7 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
                 if current_state.status in ['ON', 'OFF'] and \
                         data['action_time'] is not None:
                     latency = now - data['action_time']
-                    await analytics_collect(
+                    await analytics_collect_session(
                         t='timing',
                         utc='Toggle',
                         utv=name.title(),
@@ -180,7 +207,7 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
 
                     if current_state.status not in ['NONE', 'UNKNOWN']:
                         error(f'Unexpected status {current_state.status}')
-                        await analytics_collect(
+                        await analytics_collect_session(
                             t='exception',
                             exd=f'{name.title()}UnexpectedState{current_state.status}',
                             exf=0)
@@ -192,7 +219,7 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
                 info('{} error changed from {} to {}'.format(name, prev_state.error, current_state.error))
 
                 if current_state.error is not None:
-                    await analytics_collect(
+                    await analytics_collect_session(
                         t='exception', exd=f'{name.title()}Error{current_state.error}', exf=0)
 
                 await ws.send(
@@ -200,3 +227,19 @@ async def listen(ws, analytics_collect, action_metadata, on_images, off_images, 
                         'event': 'setTitle',
                         'context': context,
                         'payload': {'title': current_state.error}}))
+
+        # Our in-call status has changed. Report this.
+        #
+        # Do this outside of the action_metadata loop above because the in-call
+        # status spans all actions.
+        #
+        # NOTE: We use the Session Control (sc) GA parmeter here to try to
+        #       get tighter control over session lifetimes. Hopefully even if
+        #       there is a blackholed client_id active, setting sc=end will
+        #       allow it to begin reporting events to a new session. See #40.
+        if in_call != is_call_active(action_metadata):
+            await analytics_collect(
+                    t='event',
+                    ec='Call',
+                    ea='End' if in_call else 'Begin',
+                    sc='end' if in_call else 'start')

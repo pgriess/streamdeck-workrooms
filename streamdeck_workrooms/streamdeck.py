@@ -91,6 +91,11 @@ async def process_message(msg, now, ws, analytics_collect, action_metadata):
 
             return
 
+        # NOTE: It's safe to use analytics here because we're guaranteed that
+        #       this action is in a valid {ON, OFF} state, and thus we're in a
+        #       call.  It would be great to be more careful about this. It's
+        #       pretty fragile.
+
         info('toggling {} status'.format(action))
         try:
             proc = await asyncio.create_subprocess_exec(
