@@ -1,3 +1,18 @@
+# Setting up your development environment
+
+First set up a virtualenv and install the dependencies:
+
+```sh
+$ python -m venv env
+$ python -m pip install .
+```
+
+Next, to build the plugin:
+
+```sh
+$ make
+```
+
 # Releases
 
 The general rule for releases is as follows.
