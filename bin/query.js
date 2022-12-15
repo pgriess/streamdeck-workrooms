@@ -9,7 +9,7 @@
     let micButtonRegex = /^(mute|unmute) microphone$/i;
     let cameraButtonRegex = /^turn (off|on) (video|camera)$/i;
     let handButtonRegex = /^(raise|lower) hand$/i;
-    let callButtonRegex = /^(join as )|(join room)|(end call)/i;
+    let callButtonRegex = /^(join as )|(join room)|(join workroom)|(end call)/i;
     // ***** END *****
 
     // Detect post-call screens and short-circuit the rest of the checks.
@@ -38,56 +38,40 @@
         return "NONE";
     }
 
-    let micOffRegex = /^unmute microphone$/i;
-    let micOnRegex = /^mute microphone$/i;
-    let micText = Array.from(document.querySelectorAll('span'))
-        .filter((n) => { return n.textContent.match(micButtonRegex); })
-        .map((n) => { return n.textContent; })
-        .join('');
+    let micOff = "Unmute microphone";
+    let micOn = "Mute microphone";
+    let micOffQuery = Array.from(document.querySelectorAll(`[aria-label="${micOff}"]`));
+    let micOnQuery = Array.from(document.querySelectorAll(`[aria-label="${micOn}"]`));
     let micState =
-        (micText.match(micOffRegex)) ? "OFF" :
-        (micText.match(micOnRegex)) ? "ON" :
+        micOffQuery.length > 0 ? "OFF" :
+        micOnQuery.length > 0 ? "ON" :
         "UNKNOWN";
 
-    let cameraOffRegex = /^turn on (camera|video)$/i;
-    let cameraOnRegex = /^turn off (camera|video)$/i;
-    let cameraText = Array.from(document.querySelectorAll('span'))
-        .filter((n) => { return n.textContent.match(cameraButtonRegex); })
-        .map((n) => { return n.textContent; })
-        .join('');
+    let cameraOff = "Turn on video";
+    let cameraOn = "Turn off video";
+    let cameraOffQuery = Array.from(document.querySelectorAll(`[aria-label="${cameraOff}"]`));
+    let cameraOnQuery = Array.from(document.querySelectorAll(`[aria-label="${cameraOn}"]`));        
     let cameraState =
-        (cameraText.match(cameraOffRegex)) ? "OFF" :
-        (cameraText.match(cameraOnRegex)) ? "ON" :
+        cameraOffQuery.length > 0 ? "OFF" :
+        cameraOnQuery.length > 0 ? "ON" :
         "UNKNOWN";
 
-    let handOffRegex = /^raise hand$/i;
-    let handOnRegex = /^lower hand$/i;
-    let handText = Array.from(document.querySelectorAll('span'))
-        // Node.textContent rolls up text from all child nodes. If there are
-        // nested spans, this will cause /all/ of the spans to match. Really we
-        // just want the leaf. Strip out all nodes that have children.
-        .filter((n) => { return n.childElementCount === 0 })
-        .filter((n) => { return n.textContent.match(handButtonRegex); })
-        .map((n) => { return n.textContent; })
-        .join('');
+    let handOff = "Raise hand";
+    let handOn = "Lower hand";
+    let handOffQuery = Array.from(document.querySelectorAll(`[aria-label="${handOff}"]`));
+    let handOnQuery = Array.from(document.querySelectorAll(`[aria-label="${handOn}"]`));        
     let handState =
-        (handText.match(handOffRegex)) ? "OFF" :
-        (handText.match(handOnRegex)) ? "ON" :
+        handOffQuery.length > 0 ? "OFF" :
+        handOnQuery.length > 0 ? "ON" :
         "UNKNOWN";
-
-    let callOffRegex = /^(join as )|(join room)/i;
-    let callOnRegex = /^end call$/i;
-    let callText = Array.from(document.querySelectorAll('span'))
-        // Node.textContent rolls up text from all child nodes. If there are
-        // nested spans, this will cause /all/ of the spans to match. Really we
-        // just want the leaf. Strip out all nodes that have children.
-        .filter((n) => { return n.childElementCount === 0 })
-        .filter((n) => { return n.textContent.match(callButtonRegex); })
-        .map((n) => { return n.textContent; })
-        .join('');
+    
+    let callOff = "Join Workroom"
+    let callOn = "End call";
+    let callOffQuery = Array.from(document.querySelectorAll(`[aria-label="${callOff}"]`));    
+    let callOnQuery = Array.from(document.querySelectorAll(`[aria-label="${callOn}"]`));        
     let callState =
-        (callText.match(callOffRegex)) ? "OFF" :
-        (callText.match(callOnRegex)) ? "ON" : "UNKNOWN";
+        callOffQuery.length > 0 ? "OFF" :
+        callOnQuery.length > 0 ? "ON" : "UNKNOWN";
 
     return [micState, cameraState, handState, callState].join(" ");
 }
